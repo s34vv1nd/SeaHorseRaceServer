@@ -1,0 +1,29 @@
+SESSION register "username" "password"
+  {status: , }
+
+SESSION login "username" "password"
+  {status: 200/401/500, response: {"Login successfully"/"Invalid username"/"Invalid password"}}
+
+SESSION logout
+  {status: , }
+
+ROOM create password
+  {status: 200/403/500, response: {room_id: }}
+
+ROOM join "room_id" "password"
+  {status: 200/401/404/500, response: {index: , error: }}
+
+ROOM exit
+  {status: 200/403/500, response: {error: }}
+
+GAME ready
+  {status: 200/401, response: {}}
+
+GAME start (room master only)
+  {status: 200/401/500, response: {}}
+
+GAME roll
+  {status: , response: {value: , moves: [], roll_again: 0/1}}
+
+GAME move "move_code"
+  {status: 200/401, response: {}}
