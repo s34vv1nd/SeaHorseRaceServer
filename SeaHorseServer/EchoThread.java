@@ -3,17 +3,29 @@ package SeaHorseServer;
 import java.io.*;
 import java.net.*;
 
+import SeaHorseServer.model.User;
+
 public class EchoThread extends Thread {
   protected Socket socket;
+  InputStream inp;
+  BufferedReader brinp;
+  DataOutputStream out;
+
+  User currentUser;
 
   public EchoThread(Socket clientSocket) {
     this.socket = clientSocket;
+    this.inp = null;
+    this.brinp = null;
+    this.out = null;
+    this.currentUser = null;
+  }
+
+  public void setUser(User user) {
+    this.currentUser = user;
   }
 
   public void run() {
-    InputStream inp = null;
-    BufferedReader brinp = null;
-    DataOutputStream out = null;
     try {
       inp = socket.getInputStream();
       brinp = new BufferedReader(new InputStreamReader(inp));
@@ -30,13 +42,18 @@ public class EchoThread extends Thread {
           socket.close();
           return;
         } else {
-          out.writeBytes(line + "\r");
-          out.flush();
+          // TODO: Process client request
+          // Dispatcher.getInstance().dispatch(line);
         }
       } catch (IOException e) {
         e.printStackTrace();
         return;
       }
     }
+  }
+
+  public void send(String line) throws IOException {
+    this.out.writeBytes(line + "\r");
+    this.out.flush();
   }
 }

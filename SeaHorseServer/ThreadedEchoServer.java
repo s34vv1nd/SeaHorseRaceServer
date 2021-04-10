@@ -2,12 +2,24 @@ package SeaHorseServer;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class ThreadedEchoServer {
 
     static final int PORT = 5000;
 
-    public static void main(String args[]) {
+    static private ThreadedEchoServer instance;
+
+    public ArrayList<EchoThread> clientThreads;
+
+    static public ThreadedEchoServer getInstance() {
+        if (instance == null) {
+            instance = new ThreadedEchoServer();
+        }
+        return instance;
+    }
+
+    public ThreadedEchoServer() {
         ServerSocket serverSocket = null;
         Socket socket = null;
 
@@ -17,6 +29,7 @@ public class ThreadedEchoServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         while (true) {
             try {
                 socket = serverSocket.accept();
@@ -24,7 +37,13 @@ public class ThreadedEchoServer {
                 System.out.println("I/O error: " + e);
             }
             // new thread for a client
-            new EchoThread(socket).start();
+            EchoThread thread = new EchoThread(socket);
+            clientThreads.add(thread);
+            thread.start();
         }
+    }
+
+    public static void main(String args[]) {
+        new ThreadedEchoServer();
     }
 }
