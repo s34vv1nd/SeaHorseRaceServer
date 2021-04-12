@@ -30,6 +30,8 @@ public class ThreadedEchoServer {
             e.printStackTrace();
         }
 
+        clientThreads = new ArrayList<EchoThread>();
+
         while (true) {
             try {
                 socket = serverSocket.accept();

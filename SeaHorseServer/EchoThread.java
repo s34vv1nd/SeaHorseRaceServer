@@ -44,6 +44,8 @@ public class EchoThread extends Thread {
         } else {
           // TODO: Process client request
           // Dispatcher.getInstance().dispatch(line);
+          this.out.writeBytes(line + "\r");
+          this.out.flush();
         }
       } catch (IOException e) {
         e.printStackTrace();
