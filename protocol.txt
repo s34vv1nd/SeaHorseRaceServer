@@ -2,7 +2,7 @@ SESSION register "username" "password"
   {status: , }
 
 SESSION login "username" "password"
-  {status: 200/401/500, response: {"Login successfully"/"Invalid username or password"}}
+  {status: 200/401/500, response: {message: "Login successfully"/"Invalid username or password"}}
 
 SESSION logout
   {status: , }

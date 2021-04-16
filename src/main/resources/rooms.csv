@@ -1,0 +1,6 @@
+User:
+	username, password, room_id, color
+Room:
+	id, password
+Horse:
+	room_id, color, position
