@@ -7,11 +7,11 @@ import SeaHorseServer.model.User;
 
 public class EchoThread extends Thread {
   protected Socket socket;
-  InputStream inp;
-  BufferedReader brinp;
-  DataOutputStream out;
+  private InputStream inp;
+  private BufferedReader brinp;
+  private DataOutputStream out;
 
-  User currentUser;
+  private User currentUser;
 
   public EchoThread(Socket clientSocket) {
     this.socket = clientSocket;

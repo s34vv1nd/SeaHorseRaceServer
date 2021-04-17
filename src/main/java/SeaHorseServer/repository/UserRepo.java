@@ -12,9 +12,24 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class UserRepo extends BaseRepo{
+    public static UserRepo instance;
     private ArrayList<User> usersList;
 
-    public ArrayList<User> ParseCsvToUser() {
+    private UserRepo() {}
+
+    public static UserRepo getInstance() {
+        if (instance == null) {
+            instance = new UserRepo();
+            instance.init();
+        }
+        return instance;
+    }
+
+    protected void init() {
+        this.ParseCsvToUser();
+    }
+
+    private void ParseCsvToUser() {
         usersList = new ArrayList<>();
         try (
                 Reader reader = Files.newBufferedReader(Paths.get(Utils.USER_CSV_URL))
@@ -33,6 +48,22 @@ public class UserRepo extends BaseRepo{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<User> getUsersList() {
         return usersList;
+    }
+
+    public void addUser(String username, String password) {
+        usersList.add(new User (username, password, -1, -1));
+    }
+
+    public User getUserByUserName(String username) {
+        for (User user : usersList) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
     }
 }

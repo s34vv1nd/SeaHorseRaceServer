@@ -12,9 +12,7 @@ public class User {
     @CsvBindByName (column = "color")
     private int color;
 
-    public User () {
-
-    }
+    public User () { }
 
     public User(String username, String password, int roomId, int color) {
         this.username = username;

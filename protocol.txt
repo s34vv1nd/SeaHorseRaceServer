@@ -1,26 +1,30 @@
 SESSION register "username" "password"
-  {status: , }
+    1: SESSION register success/fail
 
 SESSION login "username" "password"
-  {status: 200/401/500, response: {message: "Login successfully"/"Invalid username or password"}}
+    1: SESSION login success/fail
 
 SESSION logout
-  {status: , }
+    1: SESSION logout
 
 ROOM create "password"
-  {status: 200/403/500, response: {room_id: }}
+    1: ROOM create room_id/-1
 
 ROOM join "room_id" "password"
-  {status: 200/401/404/500, response: {index: , error: }}
+    4: ROOM join “username1” “username2” ...
 
 ROOM exit
-  {status: 200/403/500, response: {error: }}
+    4: ROOM exit “username”
 
-GAME start (room master only)
-  {status: 200/401/500, response: {message: 'Start Successfully'}}
+GAME start
+    4: GAME start
 
 GAME roll
-  {status: , response: {dice: ,rollAgain: 0/1}}
+    4: GAME roll “roll_value”
 
 GAME move "start_position/-1" "end_position/-1"
-  {status: 200/401, response: {message: "Move Successfully/Launch Successfully"}}
+    4: GAME move "start_position/-1" "end_position/-1"
+    1: GAME move fail
+
+USER fetch “username”
+    1: USER fetch “username” “color”
