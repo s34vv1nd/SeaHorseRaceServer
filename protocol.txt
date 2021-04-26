@@ -7,24 +7,38 @@ SESSION login "username" "password"
 SESSION logout
     1: SESSION logout
 
+ROOM fetch
+    1: ROOM fetch “roomid1” “roomid2” …
+
+ROOM fetch “room_id”
+    1: ROOM fetch room_id player_count status
+    1: ROOM fetch room_id fail
+
 ROOM create "password"
     1: ROOM create room_id/-1
 
 ROOM join "room_id" "password"
     4: ROOM join “username1” “username2” ...
+    1: ROOM join fail
 
 ROOM exit
     4: ROOM exit “username”
+    (Change all other players in that room to not-ready)
 
-GAME start
-    4: GAME start
+GAME ready
+    4: GAME ready
+    4: GAME start (if all players in room are ready)
 
 GAME roll
     4: GAME roll “roll_value”
 
-GAME move "start_position/-1" "end_position/-1"
-    4: GAME move "start_position/-1" "end_position/-1"
+GAME move "start_position/-color"
+    4: GAME move "start_position/-color" "end_position/-color"
     1: GAME move fail
+
+GAME uprank color rank
+    4: GAME uprank color rank
+    1: GAME uprank fail
 
 USER fetch “username”
     1: USER fetch “username” “color”

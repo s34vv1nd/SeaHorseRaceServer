@@ -32,12 +32,15 @@ public class SessionController {
     String username = lines[2];
     String password = lines[3];
     if (validateLogin(username, password)) {
+      // Create user and set current user to this user
       User user = new User(username, password, -1, -1);
       thread.setUser(user);
-      thread.send("{status: 200, response: {message:'Login Successfully!'}}");
+
+      // Send response to client
+      thread.send("SESSION login success");
     }
     else {
-      thread.send("{status: 401, response: {message: 'Invalid username or password!'}}");
+      thread.send("SESSION login fail");
     }
   }
 
@@ -59,13 +62,14 @@ public class SessionController {
       stringUser[0] = "\n" + username + "," + password + "," + "-1,-1";
       UserRepo.getInstance().AppendToCSVExample(Utils.USER_CSV_URL, stringUser);
 
+      // Add new user to user list
       UserRepo.getInstance().addUser(username, password);
       // Send response to client
-      thread.send("{status: 200, response: {message: 'Register Successfully!'}}");
+      thread.send("SESSION register success");
     }
     else {
       // Send response to client
-      thread.send("{status: 401, response: {message: 'Username already exist!'}}");
+      thread.send("SESSION register fail");
     }
   }
 
@@ -79,9 +83,6 @@ public class SessionController {
   }
 
   public void logout (EchoThread thread, String[] lines) throws IOException {
-    //TODO: handle all case of logout
-      thread.send("{status: 200, response: 'Logout Successfully!'}");
-//      thread.send("{status: 401, response: 'Username already exist!'}");
-
+      thread.send("SESSION logout");
   }
 }

@@ -3,6 +3,7 @@ package SeaHorseServer;
 import SeaHorseServer.controller.GameController;
 import SeaHorseServer.controller.RoomController;
 import SeaHorseServer.controller.SessionController;
+import SeaHorseServer.controller.UserController;
 
 import java.io.IOException;
 
@@ -12,6 +13,7 @@ public class Dispatcher {
   private SessionController sessionController;
   private RoomController roomController;
   private GameController gameController;
+  private UserController userController;
 
   public static Dispatcher getInstance() {
     if (instance == null){
@@ -31,6 +33,9 @@ public class Dispatcher {
     }
     else if (lines[0].equals("GAME")) {
       gameController = new GameController(thread, lines);
+    }
+    else if (lines[0].equals("USER")) {
+      userController = new UserController(thread, lines);
     }
     else {
       thread.send("{status: 404, response: {error: Not found!}");

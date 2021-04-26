@@ -1,9 +1,11 @@
 package SeaHorseServer.repository;
 import SeaHorseServer.model.User;
 import SeaHorseServer.utils.Utils;
+import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -50,6 +52,14 @@ public class UserRepo extends BaseRepo{
         }
     }
 
+    private void writeUserListToDB() throws IOException {
+        writeToCSV(Utils.USER_CSV_URL, new String[]{"username,password,room_id,color,status"});
+        // feed in your array (or convert your data to an array)
+        for (User user : usersList){
+            AppendToCSVExample(Utils.USER_CSV_URL, user.toArray());
+        }
+    }
+
     public ArrayList<User> getUsersList() {
         return usersList;
     }
@@ -65,5 +75,42 @@ public class UserRepo extends BaseRepo{
             }
         }
         return null;
+    }
+
+    public ArrayList<User> getUsersByRoomId(int roomId) {
+        ArrayList<User> usersListByRoomId = new ArrayList<>();
+        for (User user : usersList) {
+            if (user.getRoomId() == roomId) {
+                usersListByRoomId.add(user);
+            }
+        }
+        return usersListByRoomId;
+    }
+
+    public void setRoomId (String username, int roomId) throws IOException {
+        usersList.forEach(user -> {
+            if (user.getUsername().equals(username)) {
+                user.setRoomId(roomId);
+            }
+        });
+        this.writeUserListToDB();
+    }
+
+    public void setColor (String username, int color) throws IOException {
+        usersList.forEach(user -> {
+            if (user.getUsername().equals(username)) {
+                user.setColor(color);
+            }
+        });
+        this.writeUserListToDB();
+    }
+
+    public void setAllStatus (int roomId, int status) throws IOException {
+        usersList.forEach(user -> {
+            if (user.getRoomId() == roomId) {
+                user.setStatus(status);
+            }
+        });
+        this.writeUserListToDB();
     }
 }

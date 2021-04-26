@@ -11,6 +11,8 @@ public class User {
     private int roomId;
     @CsvBindByName (column = "color")
     private int color;
+    @CsvBindByName (column = "status")
+    private int status;
 
     public User () { }
 
@@ -19,6 +21,7 @@ public class User {
         this.password = password;
         this.roomId = roomId;
         this.color = color;
+        this.status = status;
     }
 
     public String getUsername() {
@@ -35,5 +38,24 @@ public class User {
 
     public int getColor() {
         return color;
+    }
+
+    public int getStatus() { return status; }
+
+    public void setRoomId(int roomId) { this.roomId = roomId; }
+
+    public void setColor(int color) { this. color = color; }
+
+    public void setStatus(int status) { this.status = status; }
+
+    public String[] toArray() {
+        String[] result = new String[5];
+        result[0] = this.username;
+        result[1] = this.password;
+        result[2] = Integer.toString(this.roomId);
+        result[3] = Integer.toString(this.color);
+        result[4] = Integer.toString(this.status);
+
+        return result;
     }
 }

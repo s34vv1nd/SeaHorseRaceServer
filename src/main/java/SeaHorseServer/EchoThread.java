@@ -24,6 +24,7 @@ public class EchoThread extends Thread {
   public void setUser(User user) {
     this.currentUser = user;
   }
+  public User getCurrentUser() { return this.currentUser; }
 
   public void run() {
     try {
@@ -42,10 +43,7 @@ public class EchoThread extends Thread {
           socket.close();
           return;
         } else {
-          // TODO: Process client request
           Dispatcher.getInstance().dispatch(this, line);
-          //this.out.writeBytes(line + "\r");
-          //this.out.flush();
         }
       } catch (IOException e) {
         e.printStackTrace();
