@@ -1,18 +1,24 @@
 package SeaHorseServer.controller;
 
-import SeaHorseServer.EchoThread;
+import SeaHorseServer.EchoThreadWriter;
+import SeaHorseServer.model.User;
+import SeaHorseServer.repository.HorseRepo;
+import SeaHorseServer.repository.UserRepo;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
-    EchoThread thread;
+    EchoThreadWriter thread;
     String[] lines;
-    public GameController(EchoThread thread, String[] lines) throws IOException {
+    public GameController(EchoThreadWriter thread, String[] lines) throws IOException {
         this.thread = thread;
         this.lines = lines;
 
-        if (lines[1].equals("start")) {
-            this.start(thread, lines);
+        if (lines[1].equals("ready")) {
+            this.ready(thread, lines);
         }
         else if (lines[1].equals("roll")) {
             this.roll(thread, lines);
@@ -20,44 +26,67 @@ public class GameController {
         else if (lines[1].equals("move")) {
             this.move(thread, lines);
         }
+        else if (lines[1].equals("uprank")) {
+            this.uprank(thread, lines);
+        }
     }
 
-    private void start(EchoThread thread, String[] lines) throws IOException {
-        thread.send ("{status: 200, response: {message: 'Start Successfully'}}");
+    private void uprank(EchoThreadWriter thread, String[] lines) {
+
     }
 
-    private void roll(EchoThread thread, String[] lines) throws IOException {
+    private void ready(EchoThreadWriter thread, String[] lines) throws IOException {
+        int roomId = thread.getCurrentUser().getRoomId();
+        boolean allReady = true;
+
+        // Change status of current user
+        thread.getCurrentUser().setStatus(1);
+
+        // Change status in DB
+        UserRepo.getInstance().setStatus(thread.getCurrentUser().getUsername(), 1);
+
+        ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
+        for (User user : userArrayList) {
+            try {
+                if (user == null) System.out.println("user is null");
+                user.send("GAME ready " + thread.getCurrentUser().getUsername());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (user.getStatus() == 0) {
+                allReady = false;
+            }
+        }
+        if (allReady) {
+            for (User user : userArrayList) {
+                try {
+                    user.send("GAME start");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void roll(EchoThreadWriter thread, String[] lines) throws IOException {
         Random rand = new Random();
-        int rollAgain = 0;
         int dice = rand.nextInt(6) + 1;
-        if (dice == 6) {
-            rollAgain = 1;
-        }
 
-        thread.send ("{status: 200, response: {dice:" + dice + ", rollAgain:" + rollAgain +  "}}");
+        int roomId = thread.getCurrentUser().getRoomId();
+        ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
+
+        for (User user : userArrayList) {
+            user.send("GAME roll " + dice);
+        }
     }
 
-    private void move(EchoThread thread, String[] lines) throws IOException {
+    private void move(EchoThreadWriter thread, String[] lines) throws IOException {
         int startPos = Integer.parseInt(lines[2]);
-        int endPos = Integer.parseInt(lines[3]);
 
-        if (startPos == -1 && endPos == -1) {
-            if (canLaunch()) {
-                thread.send("{status: 200, response: {message: 'Launch Successfully'}}");
-            } else {
-                thread.send("{status: 404, response: {message: 'Launch Fail'}");
-            }
-        } else {
-            if (canMove()) {
-                thread.send("{status: 200, response: {message: 'Move Successfully'}}");
-            } else {
-                thread.send("{status: 404, response: {message: 'Move Fail'}");
-            }
-        }
     }
 
-    private boolean canMove() {
-        //TODO: read the state of the board to decide can move or not
+    private boolean canMove(int startPos) {
+        //HorseRepo.getInstance().getHorseList();
         return true;
     }
 

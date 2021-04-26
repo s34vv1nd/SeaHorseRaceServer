@@ -1,4 +1,5 @@
 package SeaHorseServer.repository;
+import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.User;
 import SeaHorseServer.utils.Utils;
 import com.opencsv.CSVWriter;
@@ -78,10 +79,13 @@ public class UserRepo extends BaseRepo{
     }
 
     public ArrayList<User> getUsersByRoomId(int roomId) {
+        System.out.println(roomId);
         ArrayList<User> usersListByRoomId = new ArrayList<>();
+        System.out.println(usersList);
         for (User user : usersList) {
             if (user.getRoomId() == roomId) {
                 usersListByRoomId.add(user);
+                System.out.println(user.getUsername());
             }
         }
         return usersListByRoomId;
@@ -108,6 +112,15 @@ public class UserRepo extends BaseRepo{
     public void setAllStatus (int roomId, int status) throws IOException {
         usersList.forEach(user -> {
             if (user.getRoomId() == roomId) {
+                user.setStatus(status);
+            }
+        });
+        this.writeUserListToDB();
+    }
+
+    public void setStatus (String username, int status) throws IOException {
+        usersList.forEach(user -> {
+            if (user.getUsername().equals(username)) {
                 user.setStatus(status);
             }
         });

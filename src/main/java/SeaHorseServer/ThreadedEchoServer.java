@@ -8,18 +8,10 @@ public class ThreadedEchoServer {
 
     static final int PORT = 5000;
 
-    static private ThreadedEchoServer instance;
+    public static ArrayList<EchoThreadWriter> clientThreads;
 
-    public ArrayList<EchoThread> clientThreads;
 
-    static public ThreadedEchoServer getInstance() {
-        if (instance == null) {
-            instance = new ThreadedEchoServer();
-        }
-        return instance;
-    }
-
-    public ThreadedEchoServer() {
+    private ThreadedEchoServer() {
         ServerSocket serverSocket = null;
         Socket socket = null;
 
@@ -30,7 +22,7 @@ public class ThreadedEchoServer {
             e.printStackTrace();
         }
 
-        clientThreads = new ArrayList<EchoThread>();
+        clientThreads = new ArrayList<EchoThreadWriter>();
 
         while (true) {
             try {
@@ -38,10 +30,14 @@ public class ThreadedEchoServer {
             } catch (IOException e) {
                 System.out.println("I/O error: " + e);
             }
+
             // new thread for a client
-            EchoThread thread = new EchoThread(socket);
-            clientThreads.add(thread);
-            thread.start();
+            EchoThreadWriter threadWriter = new EchoThreadWriter(socket);
+            threadWriter.start();
+            clientThreads.add(threadWriter);
+
+            EchoThreadReader threadReader = new EchoThreadReader(socket, threadWriter);
+            threadReader.start();
         }
     }
 

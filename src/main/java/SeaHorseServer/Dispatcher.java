@@ -22,7 +22,7 @@ public class Dispatcher {
     return instance;
   }
 
-  void dispatch(EchoThread thread, String request) throws IOException {
+  void dispatch(EchoThreadWriter thread, String request) throws IOException {
 
     String[] lines = request.split(" ");
     if (lines[0].equals("SESSION")) {

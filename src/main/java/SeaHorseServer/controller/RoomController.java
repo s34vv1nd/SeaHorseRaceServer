@@ -1,6 +1,6 @@
 package SeaHorseServer.controller;
 
-import SeaHorseServer.EchoThread;
+import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.ThreadedEchoServer;
 import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RoomController {
-    EchoThread thread;
+    EchoThreadWriter thread;
     String[] lines;
-    public RoomController(EchoThread thread, String[] lines) throws IOException {
+    public RoomController(EchoThreadWriter thread, String[] lines) throws IOException {
         this.thread = thread;
         this.lines = lines;
 
@@ -31,7 +31,7 @@ public class RoomController {
         }
     }
 
-    private void join(EchoThread thread, String[] lines) throws IOException {
+    private void join(EchoThreadWriter thread, String[] lines) throws IOException {
         int roomId = Integer.parseInt(lines[2]);
         int[] colored = new int[4];
         int color = -1;
@@ -49,11 +49,11 @@ public class RoomController {
                 }
 
                 thread.send(returnMessage);
-                for (EchoThread otherThread : ThreadedEchoServer.getInstance().clientThreads)
-                    if (otherThread.getCurrentUser().getRoomId() == roomId) {
+                for (EchoThreadWriter otherThread : ThreadedEchoServer.clientThreads) {
+                    if (otherThread.getCurrentUser() != null && otherThread.getCurrentUser().getRoomId() == roomId) {
                         otherThread.send(returnMessage);
                     }
-
+                }
                 // Get color for user
                 for (int i = 0; i <= 3; i++)
                 if (colored[i] == 0){
@@ -85,7 +85,7 @@ public class RoomController {
         return false;
     }
 
-    private void create(EchoThread thread, String[] lines) throws IOException {
+    private void create(EchoThreadWriter thread, String[] lines) throws IOException {
         String password = lines[2];
         int roomId = RoomRepo.getInstance().getNewId();
 
@@ -99,7 +99,7 @@ public class RoomController {
         thread.send("Room create " + roomId);
     }
 
-    private void exit(EchoThread thread, String[] lines) throws IOException {
+    private void exit(EchoThreadWriter thread, String[] lines) throws IOException {
         // Update this all user status to not ready
         int roomId = thread.getCurrentUser().getRoomId();
         UserRepo.getInstance().setAllStatus(roomId, 0);
@@ -111,14 +111,14 @@ public class RoomController {
         //Send result to all user
         String returnMessage = "ROOM exit " + thread.getCurrentUser().getUsername();
         thread.send(returnMessage);
-        for (EchoThread otherThread : ThreadedEchoServer.getInstance().clientThreads)
+        for (EchoThreadWriter otherThread : ThreadedEchoServer.clientThreads)
             if (otherThread.getCurrentUser().getRoomId() == roomId) {
                 otherThread.send(returnMessage);
             }
 
     }
 
-    private void fetch(EchoThread thread, String[] lines) throws IOException {
+    private void fetch(EchoThreadWriter thread, String[] lines) throws IOException {
         if (lines.length > 2) {
             //fetch with id
             int roomId = Integer.parseInt(lines[2]);

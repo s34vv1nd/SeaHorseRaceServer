@@ -25,20 +25,44 @@ public class EchoClient {
         outputStream = new PrintWriter(socket.getOutputStream());
         System.out.println("Client Address : " + address);
 
-        while (true) {
-            requestMessage = messageBuffer.readLine();
-            if (requestMessage.equals("QUIT")) {
-                break;
+        Thread readerThread = new Thread(() -> {
+            while (true) {
+                String response = null;
+                try {
+                    response = responseBuffer.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Server Response : " + response);
             }
-            outputStream.println(requestMessage);
-            outputStream.flush();
-            String response = responseBuffer.readLine();
-            System.out.println("Server Response : " + response);
-        }
-        responseBuffer.close();
-        outputStream.close();
-        messageBuffer.close();
-        socket.close();
-        System.out.println("Connection Closed");
+        });
+        readerThread.start();
+
+        Thread writerThread = new Thread(() -> {
+            while (true) {
+                try {
+                    requestMessage = messageBuffer.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (requestMessage.equals("QUIT")) {
+                    try {
+                        responseBuffer.close();
+                        outputStream.close();
+                        messageBuffer.close();
+                        socket.close();
+                    }
+                    catch (java.io.IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("Connection Closed");
+                    break;
+                }
+                outputStream.println(requestMessage);
+                outputStream.flush();
+            }
+        });
+        writerThread.start();
     }
+
 }

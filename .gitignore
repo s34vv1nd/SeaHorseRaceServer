@@ -1,3 +1,4 @@
+!pom.xml
 bin
 .idea
 out
@@ -7,3 +8,4 @@ target
 *.prefs
 *.class
 *.classpath
+*.iml

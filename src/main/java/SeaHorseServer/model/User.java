@@ -1,6 +1,9 @@
 package SeaHorseServer.model;
 
+import SeaHorseServer.EchoThreadWriter;
 import com.opencsv.bean.CsvBindByName;
+
+import java.io.IOException;
 
 public class User {
     @CsvBindByName (column = "username")
@@ -13,6 +16,8 @@ public class User {
     private int color;
     @CsvBindByName (column = "status")
     private int status;
+
+    private EchoThreadWriter writer;
 
     public User () { }
 
@@ -57,5 +62,13 @@ public class User {
         result[4] = Integer.toString(this.status);
 
         return result;
+    }
+
+    public void setWriter(EchoThreadWriter writer) {
+        this.writer = writer;
+    }
+
+    public void send(String line) throws IOException {
+        writer.send(line);
     }
 }
