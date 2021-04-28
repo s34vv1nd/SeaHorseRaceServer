@@ -1,9 +1,11 @@
 package SeaHorseServer.controller;
 
 import SeaHorseServer.EchoThreadWriter;
+import SeaHorseServer.model.Horse;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.HorseRepo;
 import SeaHorseServer.repository.UserRepo;
+import SeaHorseServer.utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,6 +30,8 @@ public class GameController {
         }
         else if (lines[1].equals("uprank")) {
             this.uprank(thread, lines);
+        } else if (lines[1].equals("launch")) {
+            this.launch(thread, lines);
         }
     }
 
@@ -82,16 +86,62 @@ public class GameController {
 
     private void move(EchoThreadWriter thread, String[] lines) throws IOException {
         int startPos = Integer.parseInt(lines[2]);
+        int dice = Integer.parseInt(lines[3]);
 
+        if (canMove(startPos, startPos + dice)) {
+            int roomId = thread.getCurrentUser().getRoomId();
+            ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
+
+            for (User user : userArrayList) {
+                user.send("GAME move " + startPos + " " + (startPos + dice));
+            }
+        } else {
+            thread.getCurrentUser().send("GAME move fail");
+        }
     }
 
-    private boolean canMove(int startPos) {
-        //HorseRepo.getInstance().getHorseList();
+    private boolean canMove(int startPos, int endPos) {
+        int roomId = thread.getCurrentUser().getRoomId();
+        ArrayList<Horse> horseArrayList = HorseRepo.getInstance().getHorsesListByRoomId(roomId);
+
+        for (Horse horse : horseArrayList) {
+            if (horse.getPosition() > startPos && horse.getPosition() < endPos) {
+                return false;
+            }
+        }
         return true;
     }
 
+    private void launch(EchoThreadWriter thread, String[] lines) throws IOException {
+        if (canLaunch()) {
+            // Create a horse to DB
+            int roomId = thread.getCurrentUser().getRoomId();
+            int color = thread.getCurrentUser().getColor();
+            int position = Utils.STARTING_POSITIONS[color];
+            int rank = 0;
+            Horse horse = new Horse(roomId, color, position, rank);
+            HorseRepo.getInstance().addNewHorse(horse);
+
+            // Send feedback to user
+            ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
+
+            for (User user : userArrayList) {
+                user.send("GAME launch success");
+            }
+        } else {
+            thread.getCurrentUser().send("GAME launch fail");
+        }
+    }
+
     private boolean canLaunch() {
-        //TODO: read the state of the board to decide can launch or not
+        int roomId = thread.getCurrentUser().getRoomId();
+        ArrayList<Horse> horseArrayList = HorseRepo.getInstance().getHorsesListByRoomId(roomId);
+
+        for (Horse horse : horseArrayList) {
+            if (horse.getPosition() == Utils.STARTING_POSITIONS[thread.getCurrentUser().getColor()]) {
+                return false;
+            }
+        }
         return true;
     }
 }

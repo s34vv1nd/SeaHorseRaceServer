@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class UserRepo extends BaseRepo{
-    public static UserRepo instance;
+    private static UserRepo instance;
     private ArrayList<User> usersList;
 
     private UserRepo() {}

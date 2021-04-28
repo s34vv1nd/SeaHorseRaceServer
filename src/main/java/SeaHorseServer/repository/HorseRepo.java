@@ -59,4 +59,19 @@ public class HorseRepo extends BaseRepo {
             AppendToCSVExample(Utils.USER_CSV_URL, horse.toArray());
         }
     }
+
+    public ArrayList<Horse> getHorsesListByRoomId(int roomId) {
+        ArrayList<Horse> horseArrayList = new ArrayList<>();
+        for (Horse horse : horsesList)
+        if (horse.getRoomId() == roomId){
+            horseArrayList.add(horse);
+        }
+        return horseArrayList;
+    }
+
+    public void addNewHorse (Horse horse) throws IOException {
+
+        String[] stringHorse = horse.toArray();
+        AppendToCSVExample(Utils.HORSE_CSV_URL, stringHorse);
+    }
 }

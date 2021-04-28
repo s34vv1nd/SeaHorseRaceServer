@@ -12,6 +12,13 @@ public class Horse {
     @CsvBindByName(column = "rank")
     private int rank;
 
+    public Horse(int roomId, int color, int position, int rank) {
+        this.roomId = roomId;
+        this.color = color;
+        this.position = position;
+        this. rank = rank;
+    }
+
     public int getRoomId() {
         return roomId;
     }
