@@ -30,7 +30,6 @@ public class SessionController {
   public void login(EchoThreadWriter thread, String[] lines) throws IOException {
     String username = lines[2];
     String password = lines[3];
-    thread.send("SESSION login " + username);
 
     if (validateLogin(username, password)) {
       // Create user and set current user to this user
@@ -38,10 +37,10 @@ public class SessionController {
       thread.getCurrentUser().setWriter(thread);
 
       // Send response to client
-      thread.send("SESSION login success");
+      thread.send("SESSION login " + username +  " success");
     }
     else {
-      thread.send("SESSION login fail");
+      thread.send("SESSION login " + username + " fail");
     }
   }
 

@@ -28,29 +28,29 @@ public class HorseRepo extends BaseRepo {
     }
 
     protected void init() {
-        horsesList = new ArrayList<Horse>();
+        ParseCsvToHorse();
     }
 
-//    private void ParseCsvToHorse() {
-//        horsesList = new ArrayList<Horse>();
-//        try (
-//                Reader reader = Files.newBufferedReader(Paths.get(Utils.HORSE_CSV_URL))
-//        ) {
-//            CsvToBean<Horse> csvToBean = new CsvToBeanBuilder(reader)
-//                    .withType(Horse.class)
-//                    .withIgnoreLeadingWhiteSpace(true)
-//                    .build();
-//
-//            Iterator<Horse> csvHorseIterator = csvToBean.iterator();
-//
-//            while (csvHorseIterator.hasNext()) {
-//                Horse csvHorse = csvHorseIterator.next();
-//                horsesList.add(csvHorse);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    private void ParseCsvToHorse() {
+        horsesList = new ArrayList<Horse>();
+        try (
+                Reader reader = Files.newBufferedReader(Paths.get(Utils.HORSE_CSV_URL))
+        ) {
+            CsvToBean<Horse> csvToBean = new CsvToBeanBuilder(reader)
+                    .withType(Horse.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
+
+            Iterator<Horse> csvHorseIterator = csvToBean.iterator();
+
+            while (csvHorseIterator.hasNext()) {
+                Horse csvHorse = csvHorseIterator.next();
+                horsesList.add(csvHorse);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     private void writeHorseListToDB() throws IOException {
         writeToCSV(Utils.HORSE_CSV_URL, new String[]{"room_id,color,position,rank"});

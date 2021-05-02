@@ -2,6 +2,7 @@ SESSION register "username" "password"
     1: SESSION register success/fail
 
 SESSION login "username" "password"
+    1: SESSION login "username"
     1: SESSION login success/fail
 
 SESSION logout
