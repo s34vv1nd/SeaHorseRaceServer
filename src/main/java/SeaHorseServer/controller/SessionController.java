@@ -30,6 +30,8 @@ public class SessionController {
   public void login(EchoThreadWriter thread, String[] lines) throws IOException {
     String username = lines[2];
     String password = lines[3];
+    thread.send("SESSION login " + username);
+
     if (validateLogin(username, password)) {
       // Create user and set current user to this user
       thread.setUser(UserRepo.getInstance().getUserByUserName(username));

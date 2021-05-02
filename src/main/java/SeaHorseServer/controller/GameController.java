@@ -2,8 +2,10 @@ package SeaHorseServer.controller;
 
 import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.Horse;
+import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.HorseRepo;
+import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.repository.UserRepo;
 import SeaHorseServer.utils.Utils;
 
@@ -13,6 +15,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GameController {
+    private static int dice;
+
     EchoThreadWriter thread;
     String[] lines;
     public GameController(EchoThreadWriter thread, String[] lines) throws IOException {
@@ -35,8 +39,41 @@ public class GameController {
         }
     }
 
-    private void uprank(EchoThreadWriter thread, String[] lines) {
+    private boolean gameEnd (int color) throws IOException {
+        boolean[] rank = new boolean[7];
 
+        ArrayList<Horse> horseArrayList = HorseRepo.getInstance().getAllHorseList();
+
+        for (Horse horse : horseArrayList)
+            if (horse.getColor() == color){
+                rank[horse.getColor()] = true;
+            }
+
+        for (int i = 3; i <= 6; i++)
+            if (!rank[i]){
+                return false;
+            }
+
+        return true;
+
+
+    }
+
+    private void uprank(EchoThreadWriter thread, String[] lines) throws IOException {
+        int color = Integer.parseInt(lines[2]);
+        int curRank = Integer.parseInt(lines[3]);
+        int roomId = thread.getCurrentUser().getRoomId();
+
+        HorseRepo.getInstance().updateHorseRank(color, curRank, dice);
+
+        if (gameEnd(color)) {
+            // Send feedback to user
+            ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
+
+            for (User user : userArrayList) {
+                user.send("GAME launch " + color + " success");
+            }
+        }
     }
 
     private void ready(EchoThreadWriter thread, String[] lines) throws IOException {
@@ -74,21 +111,26 @@ public class GameController {
 
     private void roll(EchoThreadWriter thread, String[] lines) throws IOException {
         Random rand = new Random();
-        int dice = rand.nextInt(6) + 1;
+        //dice = rand.nextInt(6) + 1;
+        dice = 6;
 
         int roomId = thread.getCurrentUser().getRoomId();
         ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
 
         for (User user : userArrayList) {
-            user.send("GAME roll " + dice);
+            user.send("GAME roll " + thread.getCurrentUser().getColor() + " " + dice);
         }
     }
 
     private void move(EchoThreadWriter thread, String[] lines) throws IOException {
         int startPos = Integer.parseInt(lines[2]);
-        int dice = Integer.parseInt(lines[3]);
+        int endPos = startPos + dice;
 
-        if (canMove(startPos, startPos + dice)) {
+        if (canMove(startPos, endPos)) {
+            // Update this horse
+            HorseRepo.getInstance().updateHorsePosition(startPos, endPos);
+
+            // Send feed back to all user
             int roomId = thread.getCurrentUser().getRoomId();
             ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
 
@@ -126,7 +168,7 @@ public class GameController {
             ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
 
             for (User user : userArrayList) {
-                user.send("GAME launch success");
+                user.send("GAME launch " + color + " success");
             }
         } else {
             thread.getCurrentUser().send("GAME launch fail");
@@ -136,7 +178,9 @@ public class GameController {
     private boolean canLaunch() {
         int roomId = thread.getCurrentUser().getRoomId();
         ArrayList<Horse> horseArrayList = HorseRepo.getInstance().getHorsesListByRoomId(roomId);
-
+        if (horseArrayList.isEmpty()) {
+            return true;
+        }
         for (Horse horse : horseArrayList) {
             if (horse.getPosition() == Utils.STARTING_POSITIONS[thread.getCurrentUser().getColor()]) {
                 return false;

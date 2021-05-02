@@ -26,23 +26,27 @@ ROOM exit
     (Change all other players in that room to not-ready)
 
 GAME ready
-    4: GAME ready
+    4: GAME ready "username"
     4: GAME start (if all players in room are ready)
 
 GAME roll
-    4: GAME roll “roll_value”
+    4: GAME roll "color" “roll_value”
 
-GAME move "start_position/" "dice"
+GAME move "start_position"
     4: GAME move "start_position" "end_position"
     1: GAME move fail
 
 GAME launch
-    4: GAME launch success
+    4: GAME launch "color" success
     1: GAME launch fail
 
-GAME uprank color rank
-    4: GAME uprank color rank
+GAME uprank color "current rank"
+    4: GAME uprank "color" "current rank" "new rank"
+    4: GAME end (if someone win)
     1: GAME uprank fail
+
+GAME exit
+    4: GAME exit "username"
 
 USER fetch “username”
     1: USER fetch “username” “color”

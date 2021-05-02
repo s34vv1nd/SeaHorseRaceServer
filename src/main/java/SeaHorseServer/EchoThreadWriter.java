@@ -33,7 +33,6 @@ public class EchoThreadWriter extends Thread{
 
     public void send(String line) throws IOException {
         this.out.writeBytes(line + "\r");
-        System.out.println(currentUser.getUsername() + " " + line);
         this.out.flush();
     }
 

@@ -52,7 +52,7 @@ public class Horse {
     }
 
     public String[] toArray() {
-        String[] result = new String[5];
+        String[] result = new String[4];
         result[0] = Integer.toString(this.roomId);
         result[1] = Integer.toString(this.color);
         result[2] = Integer.toString(this.position);
