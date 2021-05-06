@@ -32,7 +32,7 @@ public class ThreadedEchoServer {
             try {
                 socket = serverSocket.accept();
             } catch (IOException e) {
-                System.out.println("I/O error: " + e);
+                e.printStackTrace();
             }
 
             mutex.lock();   // only one pair of threads registered at a time

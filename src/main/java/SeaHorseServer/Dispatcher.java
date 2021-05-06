@@ -10,10 +10,6 @@ import java.io.IOException;
 public class Dispatcher {
 
   static private Dispatcher instance;
-  private SessionController sessionController;
-  private RoomController roomController;
-  private GameController gameController;
-  private UserController userController;
 
   public static Dispatcher getInstance() {
     if (instance == null){
@@ -26,19 +22,19 @@ public class Dispatcher {
 
     String[] lines = request.split(" ");
     if (lines[0].equals("SESSION")) {
-      sessionController = new SessionController(thread, lines);
+      new SessionController(thread, lines);
     }
     else if (lines[0].equals("ROOM")) {
-      roomController = new RoomController(thread, lines);
+      new RoomController(thread, lines);
     }
     else if (lines[0].equals("GAME")) {
-      gameController = new GameController(thread, lines);
+      new GameController(thread, lines);
     }
     else if (lines[0].equals("USER")) {
-      userController = new UserController(thread, lines);
+      new UserController(thread, lines);
     }
     else {
-      thread.send("{status: 404, response: {error: Not found!}");
+      thread.send("UNDEFINED");
     }
   }
 }

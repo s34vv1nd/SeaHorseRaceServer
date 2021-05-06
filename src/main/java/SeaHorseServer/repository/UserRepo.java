@@ -1,4 +1,5 @@
 package SeaHorseServer.repository;
+
 import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.User;
 import SeaHorseServer.utils.Utils;
@@ -14,13 +15,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class UserRepo extends BaseRepo{
+public class UserRepo extends BaseRepo {
     private static UserRepo instance;
     private ArrayList<User> usersList;
 
-    private UserRepo() {}
+    private UserRepo() {
+    }
 
-    public static UserRepo getInstance() {
+    public synchronized static UserRepo getInstance() {
         if (instance == null) {
             instance = new UserRepo();
             instance.init();
@@ -28,19 +30,15 @@ public class UserRepo extends BaseRepo{
         return instance;
     }
 
-    protected void init() {
+    protected synchronized void init() {
         this.ParseCsvToUser();
     }
 
-    private void ParseCsvToUser() {
+    private synchronized void ParseCsvToUser() {
         usersList = new ArrayList<>();
-        try (
-                Reader reader = Files.newBufferedReader(Paths.get(Utils.USER_CSV_URL))
-        ) {
-            CsvToBean<User> csvToBean = new CsvToBeanBuilder(reader)
-                    .withType(User.class)
-                    .withIgnoreLeadingWhiteSpace(true)
-                    .build();
+        try (Reader reader = Files.newBufferedReader(Paths.get(Utils.USER_CSV_URL))) {
+            CsvToBean<User> csvToBean = new CsvToBeanBuilder(reader).withType(User.class)
+                    .withIgnoreLeadingWhiteSpace(true).build();
 
             Iterator<User> csvUserIterator = csvToBean.iterator();
 
@@ -53,23 +51,27 @@ public class UserRepo extends BaseRepo{
         }
     }
 
-    private void writeUserListToDB() throws IOException {
-        writeToCSV(Utils.USER_CSV_URL, new String[]{"username,password,room_id,color,status"});
+    private synchronized void writeUserListToDB() throws IOException {
+        writeToCSV(Utils.USER_CSV_URL, new String[] { "username,password,room_id,color,status" });
         // feed in your array (or convert your data to an array)
-        for (User user : usersList){
-            AppendToCSV(Utils.USER_CSV_URL, user.toArray());
+        for (User user : usersList) {
+            appendToCSV(Utils.USER_CSV_URL, user.toArray());
         }
     }
 
-    public ArrayList<User> getUsersList() {
+    public synchronized ArrayList<User> getUsersList() {
         return usersList;
     }
 
-    public void addUser(String username, String password) {
-        usersList.add(new User (username, password, -1, -1));
+    public synchronized void addUser(String username, String password) throws IOException {
+        usersList.add(new User(username, password, -1, -1, 0));
+        // Create string array user and add to database
+        String[] stringUser = new String[1];
+        stringUser[0] = username + "," + password + "," + "-1,-1,0";
+        appendToCSV(Utils.USER_CSV_URL, stringUser);
     }
 
-    public User getUserByUserName(String username) {
+    public synchronized User getUserByUserName(String username) {
         for (User user : usersList) {
             if (user.getUsername().equals(username)) {
                 return user;
@@ -78,38 +80,29 @@ public class UserRepo extends BaseRepo{
         return null;
     }
 
-    public ArrayList<User> getUsersByRoomId(int roomId) {
-        System.out.println(roomId);
+    public synchronized ArrayList<User> getUsersByRoomId(int roomId) {
         ArrayList<User> usersListByRoomId = new ArrayList<>();
-        System.out.println(usersList);
         for (User user : usersList) {
             if (user.getRoomId() == roomId) {
                 usersListByRoomId.add(user);
-                System.out.println(user.getUsername());
             }
         }
         return usersListByRoomId;
     }
 
-    public void setRoomId (String username, int roomId) throws IOException {
-        usersList.forEach(user -> {
-            if (user.getUsername().equals(username)) {
-                user.setRoomId(roomId);
-            }
-        });
+    public synchronized void setRoomId(String username, int roomId) throws IOException {
+        User user = getUserByUserName(username);
+        user.setRoomId(roomId);
+        this.writeUserListToDB();
+    }
+    
+    public synchronized void setColor(String username, int color) throws IOException {
+        User user = getUserByUserName(username);
+        user.setColor(color);
         this.writeUserListToDB();
     }
 
-    public void setColor (String username, int color) throws IOException {
-        usersList.forEach(user -> {
-            if (user.getUsername().equals(username)) {
-                user.setColor(color);
-            }
-        });
-        this.writeUserListToDB();
-    }
-
-    public void setAllStatus (int roomId, int status) throws IOException {
+    public synchronized void setAllStatus(int roomId, int status) throws IOException {
         usersList.forEach(user -> {
             if (user.getRoomId() == roomId) {
                 user.setStatus(status);
@@ -118,7 +111,7 @@ public class UserRepo extends BaseRepo{
         this.writeUserListToDB();
     }
 
-    public void setStatus (String username, int status) throws IOException {
+    public synchronized void setStatus(String username, int status) throws IOException {
         usersList.forEach(user -> {
             if (user.getUsername().equals(username)) {
                 user.setStatus(status);

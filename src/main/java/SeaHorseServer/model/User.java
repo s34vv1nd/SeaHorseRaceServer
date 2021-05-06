@@ -21,7 +21,7 @@ public class User {
 
     public User () { }
 
-    public User(String username, String password, int roomId, int color) {
+    public User(String username, String password, int roomId, int color, int status) {
         this.username = username;
         this.password = password;
         this.roomId = roomId;
@@ -60,15 +60,22 @@ public class User {
         result[2] = Integer.toString(this.roomId);
         result[3] = Integer.toString(this.color);
         result[4] = Integer.toString(this.status);
-
         return result;
+    }
+
+    public boolean isWriterExist() {
+        return writer != null;
     }
 
     public void setWriter(EchoThreadWriter writer) {
         this.writer = writer;
     }
 
-    public void send(String line) throws IOException {
-        writer.send(line);
+    public boolean send(String line) throws IOException {
+        if (writer != null) {
+            writer.send(line);
+            return true;
+        }
+        return false;
     }
 }

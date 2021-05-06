@@ -28,7 +28,7 @@ public class EchoThreadReader extends Thread {
     while (true) {
       try {
         line = brinp.readLine();
-        System.out.println(line);
+        System.out.println("Client sent: " + line);
         if ((line == null) || line.equalsIgnoreCase("QUIT")) {
           socket.close();
           return;

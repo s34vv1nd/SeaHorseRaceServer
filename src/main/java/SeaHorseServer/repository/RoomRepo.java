@@ -50,15 +50,33 @@ public class RoomRepo extends BaseRepo{
         }
     }
 
+    private synchronized void writeRoomListToDB() throws IOException {
+        writeToCSV(Utils.ROOM_CSV_URL, new String[]{"id,password,currentTurn"});
+        // feed in your array (or convert your data to an array)
+        for (Room room : roomsList){
+            appendToCSV(Utils.ROOM_CSV_URL, room.toArray());
+        }
+    }
+
+    public void removeRoom(int roomId) throws IOException {
+        Room room = getRoomById(roomId);
+        roomsList.remove(room);
+        writeRoomListToDB();
+    }
+
     public ArrayList<Room> getRoomsList() {
         return roomsList;
     }
 
-    public void addRoom(int id, String password, int status) {
-        roomsList.add(new Room (id, password, 0));
+    public synchronized void addRoom(int id, String password) throws IOException {
+        roomsList.add(new Room (id, password, -1));
+        //Add new room to database
+        String[] stringRoom = new String[1];
+        stringRoom[0] = Integer.toString(id) + "," + password + ",-1";
+        appendToCSV(Utils.ROOM_CSV_URL, stringRoom);
     }
 
-    public Room getRoomById(int id) {
+    public synchronized Room getRoomById(int id) {
         for (Room room : roomsList) {
             if (room.getId() == id) {
                 return room;
@@ -67,13 +85,10 @@ public class RoomRepo extends BaseRepo{
         return null;
     }
 
-    public int getNewId() {
-        int maxId = -1;
-        for (Room room : roomsList) {
-            if (room.getId() > maxId) {
-                maxId = room.getId();
-            }
-        }
-        return maxId + 1;
+    private static int maxId = 0;
+
+    public synchronized int getNewId() {
+        maxId++;
+        return maxId;
     }
 }

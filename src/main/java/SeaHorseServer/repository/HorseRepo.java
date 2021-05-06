@@ -52,11 +52,11 @@ public class HorseRepo extends BaseRepo {
         }
     }
 
-    private void writeHorseListToDB() throws IOException {
+    private synchronized void writeHorseListToDB() throws IOException {
         writeToCSV(Utils.HORSE_CSV_URL, new String[]{"room_id,color,position,rank"});
         // feed in your array (or convert your data to an array)
         for (Horse horse : horsesList){
-            AppendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
+            appendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
         }
     }
 
@@ -73,13 +73,12 @@ public class HorseRepo extends BaseRepo {
         if (horse.getRoomId() == roomId){
             horseArrayList.add(horse);
         }
-        System.out.println(horseArrayList);
         return horseArrayList;
     }
 
-    public void addNewHorse (Horse horse) throws IOException {
+    public synchronized void addNewHorse (Horse horse) throws IOException {
         horsesList.add(horse);
-        AppendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
+        appendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
     }
 
     public void updateHorsePosition (int startPos, int endPos) throws IOException {

@@ -30,7 +30,8 @@ GAME ready
     4: GAME start (if all players in room are ready)
 
 GAME roll
-    4: GAME roll "color" “roll_value”
+    4: GAME roll success "color" “roll_value”
+    1: GAME roll fail
 
 GAME move "start_position"
     4: GAME move "start_position" "end_position"

@@ -9,4 +9,5 @@ public class Utils {
     public static final int NUM_PLAYERS_PER_ROOM = 4;
     public static final int NUM_HORSES_PER_PLAYER = 4;
     public static final int NUM_SIDES_OF_DICE = 6;
+    public static final int MAX_ROOM_NUMBER = 20;
 }
