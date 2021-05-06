@@ -17,6 +17,10 @@ public class UserController {
     private void fetch(EchoThreadWriter thread, String[] lines) throws IOException {
         String username = lines[2];
         User user = UserRepo.getInstance().getUserByUserName(username);
-        thread.send("USER fetch " + username + " " + user.getColor() + " " + user.getStatus());
+        if (user == null) {
+            thread.send("USER fetch fail " + username);
+        }
+        else 
+            thread.send("USER fetch success " + username + " " + user.getRoomId() + " " + user.getColor() + " " + user.getStatus());
     }
 }

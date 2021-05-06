@@ -35,7 +35,22 @@ public class EchoThreadReader extends Thread {
         } else {
           Dispatcher.getInstance().dispatch(echoThreadWriter, line);
         }
-      } catch (IOException e) {
+      }
+      catch (java.net.SocketException e) {
+        try {
+          socket.close();
+        } catch (IOException e1) {
+          e1.printStackTrace();
+        }
+        if (echoThreadWriter.getCurrentUser() == null) {
+          System.err.println("An user has disconnected.");
+        }
+        else {
+          System.err.println("User " + echoThreadWriter.getCurrentUser().getUsername() + " has disconnected.");
+        }
+        return;
+      }
+      catch (IOException e) {
         e.printStackTrace();
         return;
       }

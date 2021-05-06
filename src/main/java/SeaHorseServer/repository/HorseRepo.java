@@ -56,7 +56,7 @@ public class HorseRepo extends BaseRepo {
         writeToCSV(Utils.HORSE_CSV_URL, new String[]{"room_id,color,position,rank"});
         // feed in your array (or convert your data to an array)
         for (Horse horse : horsesList){
-            AppendToCSVExample(Utils.HORSE_CSV_URL, horse.toArray());
+            AppendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
         }
     }
 
@@ -79,7 +79,7 @@ public class HorseRepo extends BaseRepo {
 
     public void addNewHorse (Horse horse) throws IOException {
         horsesList.add(horse);
-        AppendToCSVExample(Utils.HORSE_CSV_URL, horse.toArray());
+        AppendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
     }
 
     public void updateHorsePosition (int startPos, int endPos) throws IOException {

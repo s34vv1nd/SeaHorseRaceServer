@@ -59,8 +59,8 @@ public class SessionController {
     if (validateUsername(username)) {
       // Create string array user and add to database
       String[] stringUser = new String[1];
-      stringUser[0] = "\n" + username + "," + password + "," + "-1,-1,0";
-      UserRepo.getInstance().AppendToCSVExample(Utils.USER_CSV_URL, stringUser);
+      stringUser[0] = username + "," + password + "," + "-1,-1,0";
+      UserRepo.getInstance().AppendToCSV(Utils.USER_CSV_URL, stringUser);
 
       // Add new user to user list
       UserRepo.getInstance().addUser(username, password);

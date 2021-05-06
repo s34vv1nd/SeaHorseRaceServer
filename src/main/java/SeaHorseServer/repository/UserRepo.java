@@ -57,7 +57,7 @@ public class UserRepo extends BaseRepo{
         writeToCSV(Utils.USER_CSV_URL, new String[]{"username,password,room_id,color,status"});
         // feed in your array (or convert your data to an array)
         for (User user : usersList){
-            AppendToCSVExample(Utils.USER_CSV_URL, user.toArray());
+            AppendToCSV(Utils.USER_CSV_URL, user.toArray());
         }
     }
 

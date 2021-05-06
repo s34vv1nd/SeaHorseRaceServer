@@ -26,8 +26,12 @@ public class RoomController {
         }
         else if (lines[1].equals("exit")) {
             this.exit(thread, lines);
-        } else if (lines[1].equals("fetch")) {
+        } 
+        else if (lines[1].equals("fetch")) {
             this.fetch(thread, lines);
+        }
+        else if (lines[1].equals("fetch_one")) {
+            this.fetchOne(thread, lines);
         }
     }
 
@@ -35,13 +39,13 @@ public class RoomController {
         int roomId = Integer.parseInt(lines[2]);
         int[] colored = new int[4];
         int color = -1;
-        String password = lines[3];
+        String password = (lines.length == 3) ? "" : lines[3];
 
         if (validateRoom(roomId, password)) {
             ArrayList<User> userListByRoomId = UserRepo.getInstance().getUsersByRoomId(roomId);
             //If number of player < 4
             if (userListByRoomId.size() < 4) {
-                String returnMessage = "ROOM join";
+                String returnMessage = "ROOM join " + roomId + " success " + thread.getCurrentUser().getUsername();
                 for (User user : userListByRoomId) {
                     returnMessage = returnMessage + " " + user.getUsername();
                     if (user.getColor() != -1)
@@ -49,7 +53,7 @@ public class RoomController {
                 }
 
                 thread.send(returnMessage);
-                for (EchoThreadWriter otherThread : ThreadedEchoServer.clientThreads) {
+                for (EchoThreadWriter otherThread : ThreadedEchoServer.clientWriterThreads) {
                     if (otherThread.getCurrentUser() != null && otherThread.getCurrentUser().getRoomId() == roomId) {
                         otherThread.send(returnMessage);
                     }
@@ -69,10 +73,10 @@ public class RoomController {
                 UserRepo.getInstance().setRoomId(thread.getCurrentUser().getUsername(), roomId);
                 UserRepo.getInstance().setColor(thread.getCurrentUser().getUsername(), color);
             } else {
-                thread.send ("ROOM join fail");
+                thread.send ("ROOM join " + roomId + " fail");
             }
         } else {
-            thread.send ("ROOM join fail");
+            thread.send ("ROOM join " + roomId + " fail");
         }
     }
 
@@ -86,17 +90,17 @@ public class RoomController {
     }
 
     private void create(EchoThreadWriter thread, String[] lines) throws IOException {
-        String password = lines[2];
+        String password = (lines.length == 2) ? "" : lines[2];
         int roomId = RoomRepo.getInstance().getNewId();
 
         //Add new room to database
         String[] stringRoom = new String[1];
         stringRoom[0] = Integer.toString(roomId) + "," + password + "," + "0";
-        RoomRepo.getInstance().AppendToCSVExample(Utils.ROOM_CSV_URL, stringRoom);
+        RoomRepo.getInstance().AppendToCSV(Utils.ROOM_CSV_URL, stringRoom);
 
         //Add new room to room list
         RoomRepo.getInstance().addRoom(roomId, password, 0);
-        thread.send("Room create " + roomId);
+        thread.send("ROOM create " + roomId + " " + password);
     }
 
     private void exit(EchoThreadWriter thread, String[] lines) throws IOException {
@@ -111,7 +115,7 @@ public class RoomController {
         //Send result to all user
         String returnMessage = "ROOM exit " + thread.getCurrentUser().getUsername();
         thread.send(returnMessage);
-        for (EchoThreadWriter otherThread : ThreadedEchoServer.clientThreads)
+        for (EchoThreadWriter otherThread : ThreadedEchoServer.clientWriterThreads)
             if (otherThread.getCurrentUser().getRoomId() == roomId) {
                 otherThread.send(returnMessage);
             }
@@ -119,24 +123,22 @@ public class RoomController {
     }
 
     private void fetch(EchoThreadWriter thread, String[] lines) throws IOException {
-        if (lines.length > 2) {
-            //fetch with id
-            int roomId = Integer.parseInt(lines[2]);
-            Room room = RoomRepo.getInstance().getRoomById(roomId);
-            if (room != null) {
-                ArrayList<User> userListByRoomId = UserRepo.getInstance().getUsersByRoomId(roomId);
-                thread.send("ROOM fetch " + room.getId() + " " + userListByRoomId.size() + " " + room.getStatus());
-            } else {
-                thread.send("ROOM fetch " + roomId + " fail");
-            }
+        ArrayList<Room> roomList = RoomRepo.getInstance().getRoomsList();
+        String returnMessage = "ROOM fetch";
+        for (Room room : roomList) {
+            returnMessage = returnMessage + " " + room.getId();
+        }
+        thread.send(returnMessage);
+    }
+
+    private void fetchOne(EchoThreadWriter thread, String[] lines) throws IOException {
+        int roomId = Integer.parseInt(lines[2]);
+        Room room = RoomRepo.getInstance().getRoomById(roomId);
+        if (room != null) {
+            ArrayList<User> userListByRoomId = UserRepo.getInstance().getUsersByRoomId(roomId);
+            thread.send("ROOM fetch_one " + room.getId() + " " + userListByRoomId.size() + " " + room.getStatus());
         } else {
-            //fetch no id
-            ArrayList<Room> roomList = RoomRepo.getInstance().getRoomsList();
-            String returnMessage = "ROOM fetch";
-            for (Room room : roomList) {
-                returnMessage = returnMessage + " " + room.getId();
-            }
-            thread.send(returnMessage);
+            thread.send("ROOM fetch_one " + roomId + " fail");
         }
     }
 }

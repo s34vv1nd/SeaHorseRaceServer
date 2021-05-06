@@ -2,8 +2,7 @@ SESSION register "username" "password"
     1: SESSION register success/fail
 
 SESSION login "username" "password"
-    1: SESSION login "username"
-    1: SESSION login success/fail
+    1: SESSION login "username" success/fail
 
 SESSION logout
     1: SESSION logout
@@ -11,16 +10,16 @@ SESSION logout
 ROOM fetch
     1: ROOM fetch “roomid1” “roomid2” …
 
-ROOM fetch “room_id”
-    1: ROOM fetch room_id player_count status
-    1: ROOM fetch room_id fail
+ROOM fetch_one “room_id”
+    1: ROOM fetch_one room_id player_count status
+    1: ROOM fetch_one room_id fail
 
 ROOM create "password"
-    1: ROOM create room_id/-1
+    1: ROOM create room_id/-1 password
 
 ROOM join "room_id" "password"
-    4: ROOM join “username1” “username2” ...
-    1: ROOM join fail
+    4: ROOM join "room_id" success “username1” “username2” ...
+    1: ROOM join "room_id" fail
 
 ROOM exit
     4: ROOM exit “username”
@@ -49,5 +48,6 @@ GAME uprank color "current rank"
 GAME exit
     4: GAME exit "username"
 
-USER fetch “username”
-    1: USER fetch “username” “color”
+USER fetch "username"
+    1: USER fetch success "username" "room_id" "color" "status"
+    1: USER fetch fail "username"
