@@ -25,43 +25,24 @@ public class GameController {
     public GameController(EchoThreadWriter thread, String[] lines) throws IOException {
         this.thread = thread;
         this.lines = lines;
-        if (lines[1].equals("ready")) {
-            this.ready(thread, lines);
-        } else if (lines[1].equals("roll")) {
-            this.roll(thread, lines);
+        if (lines[1].equals("roll")) {
+            this.roll();
         } else if (lines[1].equals("move")) {
-            this.move(thread, lines);
+            this.move();
         } else if (lines[1].equals("uprank")) {
-            this.uprank(thread, lines);
+            this.uprank();
         } else if (lines[1].equals("launch")) {
-            this.launch(thread, lines);
+            this.launch();
         }
     }
 
-    private void ready(EchoThreadWriter thread, String[] lines) throws IOException {
-        if (thread.getCurrentUser() != null) {
-            String username = thread.getCurrentUser().getUsername();
-            int roomId = thread.getCurrentUser().getRoomId();
-            if (UserService.ready(username)) {
-                RoomService.sendToRoom(roomId, "GAME ready " + thread.getCurrentUser().getUsername());
-                if (RoomService.isEveryoneReady(roomId)) {
-                    RoomService.sendToRoom(roomId, "GAME start");
-                }
-            } else {
-                thread.send("GAME ready " + thread.getCurrentUser().getUsername() + " fail");
-            }
-        } else {
-            thread.send("GAME ready " + thread.getCurrentUser().getUsername() + " fail");
-        }
-    }
-
-    private void roll(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void roll() throws IOException {
         User user = thread.getCurrentUser();
         if (user == null) {
             thread.send("GAME roll fail");
         }
         else {
-            int dice = GameService.roll(user.getUsername());
+            dice = GameService.roll(user.getUsername());
             if (dice == -1) {
                 thread.send("GAME roll fail");
             } else {
@@ -70,7 +51,7 @@ public class GameController {
         }
     }
 
-    private void move(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void move() throws IOException {
         int startPos = Integer.parseInt(lines[2]);
         int endPos = startPos + dice;
 
@@ -83,7 +64,7 @@ public class GameController {
             ArrayList<User> userArrayList = UserRepo.getInstance().getUsersByRoomId(roomId);
 
             for (User user : userArrayList) {
-                user.send("GAME move " + startPos + " " + (startPos + dice));
+                user.send("GAME move success " + startPos + " " + (startPos + dice));
             }
         } else {
             thread.getCurrentUser().send("GAME move fail");
@@ -121,7 +102,7 @@ public class GameController {
 
     }
 
-    private void uprank(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void uprank() throws IOException {
         int color = Integer.parseInt(lines[2]);
         int curRank = Integer.parseInt(lines[3]);
         int roomId = thread.getCurrentUser().getRoomId();
@@ -138,9 +119,7 @@ public class GameController {
         }
     }
 
-    
-
-    private void launch(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void launch() throws IOException {
         if (canLaunch()) {
             // Create a horse to DB
             int roomId = thread.getCurrentUser().getRoomId();

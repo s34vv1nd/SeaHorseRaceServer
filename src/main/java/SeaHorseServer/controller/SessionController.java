@@ -10,6 +10,7 @@ import SeaHorseServer.service.UserService;
 import SeaHorseServer.utils.Utils;
 
 public class SessionController {
+
   EchoThreadWriter thread;
   String[] lines;
 
@@ -18,15 +19,15 @@ public class SessionController {
     this.lines = lines;
 
     if (lines[1].equals("login")) {
-      this.login(thread, lines);
+      this.login();
     } else if (lines[1].equals("register")) {
-      this.register(thread, lines);
+      this.register();
     } else if (lines[1].equals("logout")) {
-      this.logout(thread, lines);
+      this.logout();
     }
   }
 
-  public void login(EchoThreadWriter thread, String[] lines) throws IOException {
+  public void login() throws IOException {
     String username = lines[2];
     String password = lines[3];
     if (UserService.login(thread, username, password)) {
@@ -36,7 +37,7 @@ public class SessionController {
     }
   }
 
-  public void register(EchoThreadWriter thread, String[] lines) throws IOException {
+  public void register() throws IOException {
     String username = lines[2];
     String password = lines[3];
     if (UserService.register(username, password)) {
@@ -46,7 +47,7 @@ public class SessionController {
     }
   }
 
-  public void logout(EchoThreadWriter thread, String[] lines) throws IOException {
+  public void logout() throws IOException {
     if (UserService.logout(thread)) {
       thread.send("SESSION logout");
     }

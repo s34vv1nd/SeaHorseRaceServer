@@ -54,6 +54,8 @@ public class UserService {
       UserRepo.getInstance().setAllStatus(roomId, 0);
       UserRepo.getInstance().setRoomId(username, -1);
       UserRepo.getInstance().setColor(username, -1);
+      // TODO: remove room if noone remains
+      
       return true;
     }
     return false;

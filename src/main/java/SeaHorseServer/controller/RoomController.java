@@ -12,30 +12,32 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class RoomController {
+
     EchoThreadWriter thread;
     String[] lines;
+
     public RoomController(EchoThreadWriter thread, String[] lines) throws IOException {
         this.thread = thread;
         this.lines = lines;
 
         if (lines[1].equals("create")) {
-            this.create(thread, lines);
+            this.create();
         }
         else if (lines[1].equals("join")) {
-            this.join(thread, lines);
+            this.join();
         }
         else if (lines[1].equals("exit")) {
-            this.exit(thread, lines);
+            this.exit();
         } 
         else if (lines[1].equals("fetch")) {
-            this.fetch(thread, lines);
+            this.fetch();
         }
         else if (lines[1].equals("fetch_one")) {
-            this.fetchOne(thread, lines);
+            this.fetchOne();
         }
     }
 
-    private synchronized void join(EchoThreadWriter thread, String[] lines) throws IOException {
+    private synchronized void join() throws IOException {
         String username = thread.getCurrentUser().getUsername();
         int roomId = Integer.parseInt(lines[2]);
         String password = (lines.length == 3) ? "" : lines[3];
@@ -51,13 +53,13 @@ public class RoomController {
         }
     }
 
-    private synchronized void create(EchoThreadWriter thread, String[] lines) throws IOException {
+    private synchronized void create() throws IOException {
         String password = (lines.length == 2) ? "" : lines[2];
         int roomId = RoomService.createRoom(password);
         thread.send("ROOM create " + roomId + " " + password);
     }
 
-    private synchronized void exit(EchoThreadWriter thread, String[] lines) throws IOException {
+    private synchronized void exit() throws IOException {
         int roomId = thread.getCurrentUser().getRoomId();
         if (UserService.exitRoom(thread.getCurrentUser().getUsername())) {
             String message = "ROOM exit " + thread.getCurrentUser().getUsername() + " success";
@@ -70,7 +72,7 @@ public class RoomController {
         }
     }
 
-    private void fetch(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void fetch() throws IOException {
         ArrayList<Room> roomList = RoomRepo.getInstance().getRoomsList();
         String returnMessage = "ROOM fetch";
         for (Room room : roomList) {
@@ -79,7 +81,7 @@ public class RoomController {
         thread.send(returnMessage);
     }
 
-    private void fetchOne(EchoThreadWriter thread, String[] lines) throws IOException {
+    private void fetchOne() throws IOException {
         int roomId = Integer.parseInt(lines[2]);
         Room room = RoomRepo.getInstance().getRoomById(roomId);
         if (room != null) {
