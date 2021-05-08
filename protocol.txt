@@ -1,33 +1,37 @@
 SESSION register "username" "password"
-    1: SESSION register success/fail
+    1: SESSION register success
+    1: SESSION register fail
 
 SESSION login "username" "password"
-    1: SESSION login "username" success/fail
+    1: SESSION login success "username"
+    1: SESSION login fail "username"
 
 SESSION logout
     1: SESSION logout
 
 ROOM fetch
-    1: ROOM fetch “roomid1” “roomid2” …
+    1: ROOM fetch success “roomid1” “roomid2” …
+    1: ROOM fetch fail
 
 ROOM fetch_one “room_id”
-    1: ROOM fetch_one room_id player_count status
-    1: ROOM fetch_one room_id fail
+    1: ROOM fetch_one success room_id player_count status
+    1: ROOM fetch_one fail room_id 
 
 ROOM create "password"
-    1: ROOM create room_id/-1 password
+    1: ROOM create success room_id/-1 password
+    1: ROOM create fail
 
 ROOM join "room_id" "password"
-    4: ROOM join "room_id" success “username1” “username2” ...
-    1: ROOM join "room_id" fail
+    4: ROOM join success "room_id" “username1” “username2” ...
+    1: ROOM join fail "room_id"
 
 ROOM exit
     4: ROOM exit “username”
     (Change all other players in that room to not-ready)
 
 USER ready
-    4: USER ready "username" success
-    1: USER ready "username" fail
+    4: USER ready success "username" 
+    1: USER ready fail "username" 
     4: USER start (if all players in room are ready)
 
 USER fetch "username"
@@ -53,4 +57,3 @@ GAME uprank color "current rank"
 
 GAME exit
     4: GAME exit "username"
-
