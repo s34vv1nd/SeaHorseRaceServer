@@ -40,6 +40,7 @@ public class UserRepo extends BaseRepo {
             CsvToBean<User> csvToBean = new CsvToBeanBuilder<User>(reader)
                     .withType(User.class)
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withIgnoreEmptyLine(true)
                     .build();
 
             Iterator<User> csvUserIterator = csvToBean.iterator();

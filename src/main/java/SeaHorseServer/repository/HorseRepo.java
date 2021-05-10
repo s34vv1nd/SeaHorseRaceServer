@@ -39,6 +39,7 @@ public class HorseRepo extends BaseRepo {
             CsvToBean<Horse> csvToBean = new CsvToBeanBuilder<Horse>(reader)
                     .withType(Horse.class)
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withIgnoreEmptyLine(true)
                     .build();
 
             Iterator<Horse> csvHorseIterator = csvToBean.iterator();
