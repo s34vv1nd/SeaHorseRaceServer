@@ -46,4 +46,13 @@ public class RoomService {
     }
     return -1;
   }
+
+  public synchronized static boolean removeRoom(int roomId) throws IOException {
+    ArrayList<User> users = UserRepo.getInstance().getUsersByRoomId(roomId);
+    if (users.size() == 0) {
+      RoomRepo.getInstance().removeRoom(roomId);
+      return true;
+    } 
+    return false;
+  }
 }

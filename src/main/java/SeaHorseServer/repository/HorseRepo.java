@@ -36,7 +36,7 @@ public class HorseRepo extends BaseRepo {
         try (
                 Reader reader = Files.newBufferedReader(Paths.get(Utils.HORSE_CSV_URL))
         ) {
-            CsvToBean<Horse> csvToBean = new CsvToBeanBuilder(reader)
+            CsvToBean<Horse> csvToBean = new CsvToBeanBuilder<Horse>(reader)
                     .withType(Horse.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build();

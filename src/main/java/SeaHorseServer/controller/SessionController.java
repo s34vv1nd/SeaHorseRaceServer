@@ -2,44 +2,40 @@ package SeaHorseServer.controller;
 
 import java.io.IOException;
 
-import SeaHorseServer.EchoThreadReader;
 import SeaHorseServer.EchoThreadWriter;
-import SeaHorseServer.model.User;
-import SeaHorseServer.repository.UserRepo;
 import SeaHorseServer.service.UserService;
-import SeaHorseServer.utils.Utils;
 
 public class SessionController {
 
   EchoThreadWriter thread;
-  String[] lines;
+  String[] words;
 
-  public SessionController(EchoThreadWriter thread, String[] lines) throws IOException {
+  public SessionController(EchoThreadWriter thread, String[] words) throws IOException {
     this.thread = thread;
-    this.lines = lines;
+    this.words = words;
 
-    if (lines[1].equals("login")) {
+    if (words[1].equals("login")) {
       this.login();
-    } else if (lines[1].equals("register")) {
+    } else if (words[1].equals("register")) {
       this.register();
-    } else if (lines[1].equals("logout")) {
+    } else if (words[1].equals("logout")) {
       this.logout();
     }
   }
 
   public void login() throws IOException {
-    String username = lines[2];
-    String password = lines[3];
+    String username = words[2];
+    String password = words[3];
     if (UserService.login(thread, username, password)) {
-      thread.send("SESSION login " + username + " success");
+      thread.send("SESSION login success " + username);
     } else {
-      thread.send("SESSION login " + username + " fail");
+      thread.send("SESSION login fail " + username);
     }
   }
 
   public void register() throws IOException {
-    String username = lines[2];
-    String password = lines[3];
+    String username = words[2];
+    String password = words[3];
     if (UserService.register(username, password)) {
       thread.send("SESSION register success");
     } else {
@@ -49,7 +45,10 @@ public class SessionController {
 
   public void logout() throws IOException {
     if (UserService.logout(thread)) {
-      thread.send("SESSION logout");
+      thread.send("SESSION logout success");
+    }
+    else {
+      thread.send("SESSION logout fail");
     }
   }
 }

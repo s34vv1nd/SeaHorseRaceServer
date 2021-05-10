@@ -32,6 +32,7 @@ public class EchoThreadWriter extends Thread{
     }
 
     public void send(String line) throws IOException {
+        System.out.println("Server sent: " + line);
         this.out.writeBytes(line + "\r");
         this.out.flush();
     }

@@ -29,31 +29,38 @@ public class UserController {
                 System.err.println("Cannot dispatch " + lines[1]);
         }
     }
+
+    private synchronized boolean checkBasicConditions() {
+        if (thread.getCurrentUser() == null) return false;
+        if (thread.getCurrentUser().getRoomId() == -1) return false;
+        return true;
+    }
     
     private void fetch() throws IOException {
         String username = lines[2];
         User user = UserRepo.getInstance().getUserByUserName(username);
-        if (user == null) {
+        if (checkBasicConditions() && user != null) {
+            thread.send("USER fetch success " + username + " " + user.getRoomId() + " " + user.getColor() + " " + user.getStatus());
+        }
+        else {
             thread.send("USER fetch fail " + username);
         }
-        else 
-            thread.send("USER fetch success " + username + " " + user.getRoomId() + " " + user.getColor() + " " + user.getStatus());
     }
 
     private void ready() throws IOException {
-        if (thread.getCurrentUser() != null) {
+        if (checkBasicConditions()) {
             String username = thread.getCurrentUser().getUsername();
-            int roomId = thread.getCurrentUser().getRoomId();
             if (UserService.ready(username)) {
-                RoomService.sendToRoom(roomId, "USER ready " + thread.getCurrentUser().getUsername());
+                int roomId = thread.getCurrentUser().getRoomId();
+                RoomService.sendToRoom(roomId, "USER ready success" + thread.getCurrentUser().getUsername());
                 if (RoomService.isEveryoneReady(roomId)) {
                     RoomService.sendToRoom(roomId, "USER start");
                 }
             } else {
-                thread.send("USER ready " + thread.getCurrentUser().getUsername() + " fail");
+                thread.send("USER ready fail " + thread.getCurrentUser().getUsername());
             }
         } else {
-            thread.send("USER ready " + thread.getCurrentUser().getUsername() + " fail");
+            thread.send("USER ready fail " + thread.getCurrentUser().getUsername());
         }
     }
 }

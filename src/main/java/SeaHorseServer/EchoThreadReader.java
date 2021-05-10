@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import SeaHorseServer.model.User;
+import SeaHorseServer.service.UserService;
 
 public class EchoThreadReader extends Thread {
   protected Socket socket;
@@ -28,7 +29,7 @@ public class EchoThreadReader extends Thread {
     while (true) {
       try {
         line = brinp.readLine();
-        System.out.println("Client sent: " + line);
+        System.out.println("Server received: " + line);
         if ((line == null) || line.equalsIgnoreCase("QUIT")) {
           socket.close();
           return;
@@ -47,6 +48,12 @@ public class EchoThreadReader extends Thread {
         }
         else {
           System.err.println("User " + echoThreadWriter.getCurrentUser().getUsername() + " has disconnected.");
+          try {
+            UserService.logout(echoThreadWriter);
+          } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+          }
         }
         return;
       }

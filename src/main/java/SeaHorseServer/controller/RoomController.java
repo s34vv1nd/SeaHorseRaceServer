@@ -11,84 +11,99 @@ import SeaHorseServer.service.UserService;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class RoomController {
 
     EchoThreadWriter thread;
-    String[] lines;
+    String[] words;
 
-    public RoomController(EchoThreadWriter thread, String[] lines) throws IOException {
+    public RoomController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
-        this.lines = lines;
+        this.words = words;
 
-        if (lines[1].equals("create")) {
+        if (words[1].equals("create")) {
             this.create();
         }
-        else if (lines[1].equals("join")) {
+        else if (words[1].equals("join")) {
             this.join();
         }
-        else if (lines[1].equals("exit")) {
+        else if (words[1].equals("exit")) {
             this.exit();
         } 
-        else if (lines[1].equals("fetch")) {
+        else if (words[1].equals("fetch")) {
             this.fetch();
         }
-        else if (lines[1].equals("fetch_one")) {
+        else if (words[1].equals("fetch_one")) {
             this.fetchOne();
         }
     }
 
+    private synchronized boolean checkBasicConditions() {
+        if (thread.getCurrentUser() == null) return false;
+        return true;
+    }
+
     private synchronized void join() throws IOException {
         String username = thread.getCurrentUser().getUsername();
-        int roomId = Integer.parseInt(lines[2]);
-        String password = (lines.length == 3) ? "" : lines[3];
+        int roomId = Integer.parseInt(words[2]);
+        String password = (words.length == 3) ? "" : words[3];
 
-        if (UserService.enterRoom(username, roomId, password)) {
-            String message = "ROOM join " + roomId + " success";
+        if (checkBasicConditions() && UserService.enterRoom(username, roomId, password)) {
+            String message = "ROOM join success " + roomId;
             for (User user : UserRepo.getInstance().getUsersByRoomId(roomId)) {
                 message = message + " " + user.getUsername();
             }
             RoomService.sendToRoom(roomId, message);
         } else {
-            thread.send ("ROOM join " + roomId + " fail");
+            thread.send ("ROOM join fail " + roomId);
         }
     }
 
     private synchronized void create() throws IOException {
-        String password = (lines.length == 2) ? "" : lines[2];
+        String password = (words.length == 2) ? "" : words[2];
         int roomId = RoomService.createRoom(password);
-        thread.send("ROOM create " + roomId + " " + password);
+        if (checkBasicConditions() && roomId != -1) {
+            thread.send("ROOM create success " + roomId + " " + password);
+        }
+        else {
+            thread.send("ROOM create fail");
+        }
     }
 
     private synchronized void exit() throws IOException {
         int roomId = thread.getCurrentUser().getRoomId();
-        if (UserService.exitRoom(thread.getCurrentUser().getUsername())) {
-            String message = "ROOM exit " + thread.getCurrentUser().getUsername() + " success";
+        if (checkBasicConditions() && UserService.exitRoom(thread.getCurrentUser().getUsername())) {
+            String message = "ROOM exit success " + thread.getCurrentUser().getUsername();
             thread.send(message);
             RoomService.sendToRoom(roomId, message);
         }
         else {
-            String message = "ROOM exit " + thread.getCurrentUser().getUsername() + " fail";
-            thread.send(message);
+            thread.send("ROOM exit fail");
         }
     }
 
     private void fetch() throws IOException {
-        ArrayList<Room> roomList = RoomRepo.getInstance().getRoomsList();
-        String returnMessage = "ROOM fetch";
-        for (Room room : roomList) {
-            returnMessage = returnMessage + " " + room.getId();
+        if (checkBasicConditions()) {
+            ArrayList<Room> roomList = RoomRepo.getInstance().getRoomsList();
+            String returnMessage = "ROOM fetch success";
+            for (Room room : roomList) {
+                returnMessage = returnMessage + " " + room.getId();
+            }
+            thread.send(returnMessage);
         }
-        thread.send(returnMessage);
+        else {
+            thread.send("ROOM fetch fail");
+        }
     }
 
     private void fetchOne() throws IOException {
-        int roomId = Integer.parseInt(lines[2]);
+        int roomId = Integer.parseInt(words[2]);
         Room room = RoomRepo.getInstance().getRoomById(roomId);
-        if (room != null) {
+        if (checkBasicConditions() && room != null) {
             ArrayList<User> userListByRoomId = UserRepo.getInstance().getUsersByRoomId(roomId);
-            thread.send("ROOM fetch_one " + room.getId() + " " + userListByRoomId.size() + " " + room.getCurrentTurn());
+            thread.send("ROOM fetch_one success " + room.getId() + " " + userListByRoomId.size() + " " + room.getCurrentTurn());
         } else {
-            thread.send("ROOM fetch_one " + roomId + " fail");
+            thread.send("ROOM fetch_one fail " + roomId);
         }
     }
 }

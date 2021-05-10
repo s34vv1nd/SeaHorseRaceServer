@@ -11,11 +11,11 @@ import SeaHorseServer.repository.UserRepo;
 public class UserService {
   public synchronized static boolean register(String username, String password) throws IOException {
     User user = UserRepo.getInstance().getUserByUserName(username);
-    if (user != null) {
+    if (user == null) {
       UserRepo.getInstance().addUser(username, password);
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 
   public synchronized static boolean login(EchoThreadWriter thread, String username, String password) {
@@ -54,8 +54,7 @@ public class UserService {
       UserRepo.getInstance().setAllStatus(roomId, 0);
       UserRepo.getInstance().setRoomId(username, -1);
       UserRepo.getInstance().setColor(username, -1);
-      // TODO: remove room if noone remains
-      
+      RoomService.removeRoom(roomId);
       return true;
     }
     return false;

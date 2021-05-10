@@ -37,8 +37,10 @@ public class UserRepo extends BaseRepo {
     private synchronized void ParseCsvToUser() {
         usersList = new ArrayList<>();
         try (Reader reader = Files.newBufferedReader(Paths.get(Utils.USER_CSV_URL))) {
-            CsvToBean<User> csvToBean = new CsvToBeanBuilder(reader).withType(User.class)
-                    .withIgnoreLeadingWhiteSpace(true).build();
+            CsvToBean<User> csvToBean = new CsvToBeanBuilder<User>(reader)
+                    .withType(User.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build();
 
             Iterator<User> csvUserIterator = csvToBean.iterator();
 

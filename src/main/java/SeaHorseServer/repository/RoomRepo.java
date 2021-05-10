@@ -34,9 +34,10 @@ public class RoomRepo extends BaseRepo{
         try (
                 Reader reader = Files.newBufferedReader(Paths.get(Utils.ROOM_CSV_URL))
         ) {
-            CsvToBean<Room> csvToBean = new CsvToBeanBuilder(reader)
+            CsvToBean<Room> csvToBean = new CsvToBeanBuilder<Room>(reader)
                     .withType(Room.class)
                     .withIgnoreLeadingWhiteSpace(true)
+                    .withIgnoreEmptyLine(true)
                     .build();
 
             Iterator<Room> csvIterator = csvToBean.iterator();
@@ -85,10 +86,13 @@ public class RoomRepo extends BaseRepo{
         return null;
     }
 
-    private static int maxId = 0;
-
     public synchronized int getNewId() {
-        maxId++;
-        return maxId;
+        for (int id = 1; id < Utils.MAX_ROOM_NUMBER; ++id) {
+            if (this.getRoomById(id) == null) {
+                return id;
+            }
+        }
+        return -1;
     }
+
 }

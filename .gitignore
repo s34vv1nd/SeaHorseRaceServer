@@ -8,4 +8,4 @@ target
 *.class
 *.classpath
 *.iml
-!pom.xml
+.vscode
