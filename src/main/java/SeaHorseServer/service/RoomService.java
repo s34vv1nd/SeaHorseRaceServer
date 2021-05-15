@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.repository.UserRepo;
@@ -27,21 +28,10 @@ public class RoomService {
     return result;
   }
 
-  public synchronized static boolean isEveryoneReady(int roomId) {
-    ArrayList<User> users = UserRepo.getInstance().getUsersByRoomId(roomId);
-    for (User user : users) {
-      if (user.getStatus() == 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   public synchronized static int createRoom(String password) throws IOException {
     int currentNumberOfRooms = RoomRepo.getInstance().getRoomsList().size();
     if (currentNumberOfRooms < Utils.MAX_ROOM_NUMBER) {
-      int roomId = RoomRepo.getInstance().getNewId();
-      RoomRepo.getInstance().addRoom(roomId, password);
+      int roomId = RoomRepo.getInstance().addRoom(password);
       return roomId;
     }
     return -1;
@@ -54,5 +44,15 @@ public class RoomService {
       return true;
     } 
     return false;
+  }
+
+  public synchronized static boolean isEveryoneReady(int roomId) {
+    ArrayList<User> users = UserRepo.getInstance().getUsersByRoomId(roomId);
+    for (User user : users) {
+      if (user.getStatus() == 0) {
+        return false;
+      }
+    }
+    return true;
   }
 }

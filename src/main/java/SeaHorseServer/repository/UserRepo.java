@@ -67,7 +67,7 @@ public class UserRepo extends BaseRepo {
     }
 
     public synchronized void addUser(String username, String password) throws IOException {
-        usersList.add(new User(username, password, -1, -1, 0));
+        usersList.add(new User(username, password));
         // Create string array user and add to database
         String[] stringUser = new String[1];
         stringUser[0] = username + "," + password + "," + "-1,-1,0";

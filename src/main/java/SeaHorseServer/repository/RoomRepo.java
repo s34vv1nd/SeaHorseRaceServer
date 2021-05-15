@@ -52,7 +52,7 @@ public class RoomRepo extends BaseRepo{
     }
 
     private synchronized void writeRoomListToDB() throws IOException {
-        writeToCSV(Utils.ROOM_CSV_URL, new String[]{"id,password,currentTurn"});
+        writeToCSV(Utils.ROOM_CSV_URL, new String[]{"id,password,currentTurn,currentDice"});
         // feed in your array (or convert your data to an array)
         for (Room room : roomsList){
             appendToCSV(Utils.ROOM_CSV_URL, room.toArray());
@@ -69,12 +69,14 @@ public class RoomRepo extends BaseRepo{
         return roomsList;
     }
 
-    public synchronized void addRoom(int id, String password) throws IOException {
-        roomsList.add(new Room (id, password, -1));
+    public synchronized int addRoom(String password) throws IOException {
+        int id = this.getNewId();
+        roomsList.add(new Room (id, password));
         //Add new room to database
         String[] stringRoom = new String[1];
-        stringRoom[0] = Integer.toString(id) + "," + password + ",-1";
+        stringRoom[0] = Integer.toString(id) + "," + password + ",-1,0";
         appendToCSV(Utils.ROOM_CSV_URL, stringRoom);
+        return id;
     }
 
     public synchronized Room getRoomById(int id) {
@@ -86,13 +88,25 @@ public class RoomRepo extends BaseRepo{
         return null;
     }
 
-    public synchronized int getNewId() {
+    private synchronized int getNewId() {
         for (int id = 1; id < Utils.MAX_ROOM_NUMBER; ++id) {
             if (this.getRoomById(id) == null) {
                 return id;
             }
         }
         return -1;
+    }
+
+    public synchronized void updateRoomTurn(int roomId, int turn) throws IOException {
+        Room room = getRoomById(roomId);
+        room.setCurrentTurn(turn);
+        writeRoomListToDB();
+    }
+
+    public synchronized void updateRoomDice(int roomId, int dice) throws IOException {
+        Room room = getRoomById(roomId);
+        room.setCurrentDice(dice);
+        writeRoomListToDB();
     }
 
 }

@@ -21,12 +21,12 @@ public class User {
 
     public User () { }
 
-    public User(String username, String password, int roomId, int color, int status) {
+    public User(String username, String password) {
         this.username = username;
         this.password = password;
-        this.roomId = roomId;
-        this.color = color;
-        this.status = status;
+        this.roomId = -1;
+        this.color = -1;
+        this.status = 0;
     }
 
     public String getUsername() {

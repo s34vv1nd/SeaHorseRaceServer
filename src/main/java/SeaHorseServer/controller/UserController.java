@@ -4,6 +4,7 @@ import SeaHorseServer.EchoThreadReader;
 import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.UserRepo;
+import SeaHorseServer.service.GameService;
 import SeaHorseServer.service.RoomService;
 import SeaHorseServer.service.UserService;
 
@@ -54,6 +55,7 @@ public class UserController {
                 int roomId = thread.getCurrentUser().getRoomId();
                 RoomService.sendToRoom(roomId, "USER ready success" + thread.getCurrentUser().getUsername());
                 if (RoomService.isEveryoneReady(roomId)) {
+                    GameService.startGame(roomId);
                     RoomService.sendToRoom(roomId, "USER start");
                 }
             } else {
