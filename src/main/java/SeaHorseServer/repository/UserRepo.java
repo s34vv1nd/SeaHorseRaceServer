@@ -93,6 +93,15 @@ public class UserRepo extends BaseRepo {
         return usersListByRoomId;
     }
 
+    public synchronized User getUserByColor(int roomId, int color) {
+        for (User user : usersList) {
+            if (user.getRoomId() == roomId && user.getColor() == color) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public synchronized void setRoomId(String username, int roomId) throws IOException {
         User user = getUserByUserName(username);
         user.setRoomId(roomId);

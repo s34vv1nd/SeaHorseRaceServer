@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
+import SeaHorseServer.repository.HorseRepo;
 import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.repository.UserRepo;
 import SeaHorseServer.utils.Utils;
@@ -41,6 +42,7 @@ public class RoomService {
     ArrayList<User> users = UserRepo.getInstance().getUsersByRoomId(roomId);
     if (users.size() == 0) {
       RoomRepo.getInstance().removeRoom(roomId);
+      HorseRepo.getInstance().removeHorsesByRoomId(roomId);
       return true;
     } 
     return false;

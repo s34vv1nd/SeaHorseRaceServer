@@ -47,6 +47,9 @@ public class GameController {
             case "uprank":
                 this.uprank();
                 break;
+            case "exit":
+                this.exit();
+                break;
             default:
                 System.err.println("Cannot dispatch " + words[1]);
         }
@@ -62,14 +65,14 @@ public class GameController {
             if (dice == -1) {
                 thread.send("GAME roll fail");
             } else {
-                RoomService.sendToRoom(user.getRoomId(), "Game roll success " + user.getColor() + " " + dice);
+                RoomService.sendToRoom(user.getRoomId(), "GAME roll success " + user.getColor() + " " + dice);
             }
         }
     }
 
     private void launch() throws IOException {
         if (GameService.launch(thread.getCurrentUser())) {
-            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME launch success" + thread.getCurrentUser().getColor());
+            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME launch success " + thread.getCurrentUser().getColor());
         } else {
             thread.getCurrentUser().send("GAME launch fail");
         }
@@ -79,7 +82,7 @@ public class GameController {
         int startPos = Integer.parseInt(words[2]);
         int result = GameService.move(thread.getCurrentUser(), startPos);
         if (result != -1) {
-            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME move success " + startPos + " " + result);
+            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME move success " + thread.getCurrentUser().getColor() + " " + startPos + " " + result);
         } else {
             thread.getCurrentUser().send("GAME move fail");
         }
@@ -97,6 +100,14 @@ public class GameController {
                 GameService.endGame(thread.getCurrentUser());
                 RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME end " + thread.getCurrentUser().getColor());
             }
+        }
+    }
+
+    private void exit() throws IOException {
+        if (GameService.exit(thread.getCurrentUser())) {
+            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME exit success " + thread.getCurrentUser().getUsername());
+        } else {
+            thread.send("GAME exit fail");
         }
     }
 

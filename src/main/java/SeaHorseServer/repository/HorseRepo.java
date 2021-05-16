@@ -79,7 +79,7 @@ public class HorseRepo extends BaseRepo {
 
     public Horse getHorseByPosition(int roomId, int position) {
         for (Horse horse : horsesList)
-        if (horse.getRoomId() == roomId && horse.getPosition() == position && horse.getRank() <= 0){
+        if (horse.getRoomId() == roomId && horse.getPosition() == position && !horse.isInRank()){
             return horse;
         }
         return null;
@@ -116,6 +116,15 @@ public class HorseRepo extends BaseRepo {
     public synchronized void removeHorsesByRoomId(int roomId) throws IOException {
         ArrayList<Horse> horses = getHorsesListByRoomId(roomId);
         for (Horse horse : horses) {
+            horsesList.remove(horse);
+        }
+        writeHorseListToDB();
+    }
+
+    public synchronized void removeHorsesByColor(int roomId, int color) throws IOException {
+        ArrayList<Horse> horses = getHorsesListByRoomId(roomId);
+        for (Horse horse : horses)
+        if (horse.getColor() == color) {
             horsesList.remove(horse);
         }
         writeHorseListToDB();

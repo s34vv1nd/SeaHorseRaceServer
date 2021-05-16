@@ -1,6 +1,7 @@
 package SeaHorseServer.controller;
 
 import SeaHorseServer.EchoThreadWriter;
+import SeaHorseServer.ThreadedEchoServer;
 import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.RoomRepo;
@@ -71,6 +72,12 @@ public class RoomController {
         int roomId = RoomService.createRoom(password);
         if (checkBasicConditions() && roomId != -1) {
             thread.send("ROOM create success " + roomId + " " + password);
+            for (EchoThreadWriter _thread : ThreadedEchoServer.clientWriterThreads) {
+                User user = _thread.getCurrentUser();
+                if (user != null && user.getRoomId() == -1) {
+                    _thread.send("ROOM fetch_one success " + roomId + " " + 1 + " " + -1);
+                }
+            }
         }
         else {
             thread.send("ROOM create fail");
