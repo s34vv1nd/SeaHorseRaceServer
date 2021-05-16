@@ -41,10 +41,10 @@ public class UserService {
     return false;
   }
 
-  public synchronized static boolean ready(String username) throws IOException {
+  public synchronized static boolean ready(String username, int status) throws IOException {
     int roomId = UserRepo.getInstance().getUserByUserName(username).getRoomId();
     if (roomId == -1) return false;
-    UserRepo.getInstance().setStatus(username, 1);
+    UserRepo.getInstance().setStatus(username, status);
     return true;
   }
 

@@ -60,9 +60,10 @@ public class UserController {
     private void ready() throws IOException {
         if (checkBasicConditions()) {
             String username = thread.getCurrentUser().getUsername();
-            if (UserService.ready(username)) {
+            int status = Integer.parseInt(words[3]);
+            if (UserService.ready(username, status)) {
                 int roomId = thread.getCurrentUser().getRoomId();
-                RoomService.sendToRoom(roomId, "USER ready success" + thread.getCurrentUser().getUsername());
+                RoomService.sendToRoom(roomId, "USER ready success " + thread.getCurrentUser().getUsername() + " " + status);
                 if (RoomService.isEveryoneReady(roomId)) {
                     GameService.startGame(roomId);
                     RoomService.sendToRoom(roomId, "USER start");
