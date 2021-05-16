@@ -53,4 +53,17 @@ public class Room {
     public void setCurrentDice(int currentDice) {
         this.currentDice = currentDice;
     }
+
+    public int getCurrentPlayer() {
+        return getCurrentTurn() / 4;
+    }
+
+    public enum GameAction {
+        ROLL,
+        MOVE
+    }
+
+    public GameAction getCurrentAction() {
+        return (getCurrentTurn() % 2 == 1) ? GameAction.MOVE : GameAction.ROLL;
+    }
 }

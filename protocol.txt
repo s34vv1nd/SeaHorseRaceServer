@@ -31,7 +31,7 @@ ROOM exit
 
 USER ready
     4: USER ready success "username" 
-    1: USER ready fail "username" 
+    1: USER ready fail
     4: USER start (if all players in room are ready)
 
 USER fetch "username"
@@ -50,10 +50,10 @@ GAME launch
     4: GAME launch success "color"
     1: GAME launch fail
 
-GAME uprank color "current rank"
+GAME uprank "current rank"
     4: GAME uprank success "color" "current rank" "new rank"
     1: GAME uprank fail
-    4: GAME end (if someone win)
+    4: GAME end "color" (if someone win)
 
 GAME exit
     4: GAME exit "username"

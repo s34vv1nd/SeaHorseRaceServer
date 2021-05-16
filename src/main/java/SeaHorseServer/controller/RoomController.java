@@ -20,21 +20,28 @@ public class RoomController {
     public RoomController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
         this.words = words;
-
-        if (words[1].equals("create")) {
-            this.create();
+        if (thread.getCurrentUser() == null) {
+            System.err.println("Not login");
+            return;
         }
-        else if (words[1].equals("join")) {
-            this.join();
-        }
-        else if (words[1].equals("exit")) {
-            this.exit();
-        } 
-        else if (words[1].equals("fetch")) {
-            this.fetch();
-        }
-        else if (words[1].equals("fetch_one")) {
-            this.fetchOne();
+        switch (words[1]) {
+            case "create":
+                this.create();
+                break;
+            case "join":
+                this.join();
+                break;
+            case "exit":
+                this.exit();
+                break;
+            case "fetch":
+                this.fetch();
+                break;
+            case "fetch_one":
+                this.fetchOne();
+                break;
+            default:
+                System.err.println("Cannot dispatch " + words[1]);
         }
     }
 

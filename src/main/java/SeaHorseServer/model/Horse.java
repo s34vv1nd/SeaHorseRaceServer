@@ -2,21 +2,23 @@ package SeaHorseServer.model;
 
 import com.opencsv.bean.CsvBindByName;
 
+import SeaHorseServer.utils.Utils;
+
 public class Horse {
     @CsvBindByName(column = "room_id")
     private int roomId;
     @CsvBindByName(column = "color")
     private int color;
-    @CsvBindByName(column = "position")
-    private int position;
+    @CsvBindByName(column = "steps")
+    private int steps;
     @CsvBindByName(column = "rank")
     private int rank;
 
-    public Horse(int roomId, int color, int position, int rank) {
+    public Horse(int roomId, int color) {
         this.roomId = roomId;
         this.color = color;
-        this.position = position;
-        this. rank = rank;
+        this.steps = 0;
+        this.rank = 0;
     }
 
     public int getRoomId() {
@@ -27,12 +29,20 @@ public class Horse {
         return color;
     }
 
+    public int getSteps() {
+        return steps;
+    }
+
     public int getPosition() {
-        return position;
+        return (Utils.STARTING_POSITIONS[getColor()] + steps) % Utils.NUM_HORSE_POSITIONS;
     }
 
     public int getRank() {
         return rank;
+    }
+    
+    public boolean isInRank() {
+        return rank > 0;
     }
 
     public void setRoomId(int roomId) {
@@ -43,8 +53,8 @@ public class Horse {
         this.color = color;
     }
 
-    public void setPosition(int position) {
-        this.position = position;
+    public void setSteps(int steps) {
+        this.steps = steps;
     }
 
     public void setRank(int rank) {
@@ -55,7 +65,7 @@ public class Horse {
         String[] result = new String[4];
         result[0] = Integer.toString(this.roomId);
         result[1] = Integer.toString(this.color);
-        result[2] = Integer.toString(this.position);
+        result[2] = Integer.toString(this.steps);
         result[3] = Integer.toString(this.rank);
         return result;
     }

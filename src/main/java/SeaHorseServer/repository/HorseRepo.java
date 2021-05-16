@@ -54,7 +54,7 @@ public class HorseRepo extends BaseRepo {
     }
 
     private synchronized void writeHorseListToDB() throws IOException {
-        writeToCSV(Utils.HORSE_CSV_URL, new String[]{"room_id,color,position,rank"});
+        writeToCSV(Utils.HORSE_CSV_URL, new String[]{"room_id,color,steps,rank"});
         // feed in your array (or convert your data to an array)
         for (Horse horse : horsesList){
             appendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
@@ -77,62 +77,57 @@ public class HorseRepo extends BaseRepo {
         return horseArrayList;
     }
 
+    public Horse getHorseByPosition(int roomId, int position) {
+        for (Horse horse : horsesList)
+        if (horse.getRoomId() == roomId && horse.getPosition() == position && horse.getRank() <= 0){
+            return horse;
+        }
+        return null;
+    }
+
+    public ArrayList<Horse> getHorsesByColor(int roomId, int color) {
+        ArrayList<Horse> horseArrayList = new ArrayList<Horse>();
+        for (Horse horse : horsesList)
+        if (horse.getRoomId() == roomId && horse.getColor() == color){
+            horseArrayList.add(horse);
+        }
+        return horseArrayList;
+    }
+
+    public Horse getHorseByRank(int roomId, int color, int rank) {
+        for (Horse horse : horsesList)
+        if (horse.getRoomId() == roomId && horse.getColor() == color && horse.getSteps() == Utils.NUM_HORSE_POSITIONS - 1 && horse.getRank() == rank) {
+            return horse;
+        }
+        return null;
+    }
+
     public synchronized void addNewHorse (Horse horse) throws IOException {
         horsesList.add(horse);
         appendToCSV(Utils.HORSE_CSV_URL, horse.toArray());
     }
 
-    public void updateHorsePosition (int startPos, int endPos) throws IOException {
-        // Kick the horse
-        for (Horse horse : horsesList)
-        if (horse.getPosition() == endPos){
-            horsesList.remove(horse);
-            break;
-        }
-        //Move the horse
-        for (Horse horse : horsesList)
-        if (horse.getPosition() == startPos){
-            horse.setPosition(endPos);
-            break;
-        }
-
+    public synchronized void removeHorse(int roomId, int position) throws IOException {
+        Horse horse = getHorseByPosition(roomId, position);
+        horsesList.remove(horse);
         writeHorseListToDB();
     }
 
-    public void updateHorseRank (int color, int curRank, int newRank) throws IOException {
-        if (curRank == 0) {
-            boolean uprank = true;
-            //Check if horse can up rank
-            for (Horse horse : horsesList) {
-                if (horse.getColor() == color && horse.getRank() != 0 && horse.getRank() <= newRank) {
-                    uprank = false;
-                    break;
-                }
-            }
-            if (uprank) {
-                for (Horse horse : horsesList)
-                    if (horse.getColor() == color && Utils.STABLE_POSITIONS[color] == horse.getPosition()) {
-                        horse.setRank(newRank);
-                        break;
-                    }
-            }
-        } else if (newRank - curRank == 1) {
-            boolean uprank = true;
-            //Check if horse can up rank
-            for (Horse horse : horsesList) {
-                if (horse.getColor() == color && horse.getRank() == newRank) {
-                    uprank = false;
-                    break;
-                }
-            }
-            if (uprank) {
-                for (Horse horse : horsesList)
-                    if (horse.getColor() == color && horse.getRank() == curRank) {
-                        horse.setRank(newRank);
-                        break;
-                    }
-            }
+    public synchronized void removeHorsesByRoomId(int roomId) throws IOException {
+        ArrayList<Horse> horses = getHorsesListByRoomId(roomId);
+        for (Horse horse : horses) {
+            horsesList.remove(horse);
         }
+        writeHorseListToDB();
+    }
+
+    public synchronized void setSteps(Horse horse, int steps) throws IOException {
+        horse.setSteps(steps);
+        writeHorseListToDB();
+    }
+
+    public synchronized void setRank(Horse horse, int rank) throws IOException {
+        horse.setRank(rank);
         writeHorseListToDB();
     }
 }

@@ -13,13 +13,20 @@ import java.io.IOException;
 public class UserController {
 
     EchoThreadWriter thread;
-    String[] lines;
+    String[] words;
 
-    public UserController (EchoThreadWriter thread, String[] lines) throws IOException {
+    public UserController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
-        this.lines = lines;
-        
-        switch (lines[1]) {
+        this.words = words;
+        if (thread.getCurrentUser() == null) {
+            System.err.println("Not login");
+            return;
+        }
+        if (thread.getCurrentUser().getRoomId() == -1) {
+            System.err.println("Not in room");
+            return;
+        }
+        switch (words[1]) {
             case "fetch":
                 this.fetch();
                 break;
@@ -27,23 +34,25 @@ public class UserController {
                 this.ready();
                 break;
             default:
-                System.err.println("Cannot dispatch " + lines[1]);
+                System.err.println("Cannot dispatch " + words[1]);
         }
     }
 
     private synchronized boolean checkBasicConditions() {
-        if (thread.getCurrentUser() == null) return false;
-        if (thread.getCurrentUser().getRoomId() == -1) return false;
+        if (thread.getCurrentUser() == null)
+            return false;
+        if (thread.getCurrentUser().getRoomId() == -1)
+            return false;
         return true;
     }
-    
+
     private void fetch() throws IOException {
-        String username = lines[2];
+        String username = words[2];
         User user = UserRepo.getInstance().getUserByUserName(username);
         if (checkBasicConditions() && user != null) {
-            thread.send("USER fetch success " + username + " " + user.getRoomId() + " " + user.getColor() + " " + user.getStatus());
-        }
-        else {
+            thread.send("USER fetch success " + username + " " + user.getRoomId() + " " + user.getColor() + " "
+                    + user.getStatus());
+        } else {
             thread.send("USER fetch fail " + username);
         }
     }

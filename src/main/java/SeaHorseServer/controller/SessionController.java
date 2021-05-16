@@ -14,12 +14,18 @@ public class SessionController {
     this.thread = thread;
     this.words = words;
 
-    if (words[1].equals("login")) {
-      this.login();
-    } else if (words[1].equals("register")) {
-      this.register();
-    } else if (words[1].equals("logout")) {
-      this.logout();
+    switch (words[1]) {
+      case "login":
+        this.login();
+        break;
+      case "register":
+        this.register();
+        break;
+      case "logout":
+        this.logout();
+        break;
+      default:
+        System.err.println("Cannot dispatch " + words[1]);
     }
   }
 
@@ -46,8 +52,7 @@ public class SessionController {
   public void logout() throws IOException {
     if (UserService.logout(thread)) {
       thread.send("SESSION logout success");
-    }
-    else {
+    } else {
       thread.send("SESSION logout fail");
     }
   }
