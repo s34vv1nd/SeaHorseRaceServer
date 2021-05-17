@@ -65,7 +65,7 @@ public class GameController {
     }
 
     private void roll() throws IOException {
-        if (checkBasicConditions()) {
+        if (!checkBasicConditions()) {
             thread.send("GAME roll fail");
         }
         else {
@@ -74,6 +74,7 @@ public class GameController {
             if (words.length > 2) {
                 hackValue = Integer.parseInt(words[2]);
             }
+            System.out.println(user.getUsername() + " " + hackValue);
             int dice = GameService.roll(user, hackValue);
             if (dice == -1) {
                 thread.send("GAME roll fail");
