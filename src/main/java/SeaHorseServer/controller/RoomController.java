@@ -1,7 +1,6 @@
 package SeaHorseServer.controller;
 
 import SeaHorseServer.EchoThreadWriter;
-import SeaHorseServer.ThreadedEchoServer;
 import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.RoomRepo;
@@ -77,9 +76,8 @@ public class RoomController {
     private synchronized void exit() throws IOException {
         int roomId = thread.getCurrentUser().getRoomId();
         if (checkBasicConditions() && UserService.exitRoom(thread.getCurrentUser().getUsername())) {
-            String message = "ROOM exit success " + thread.getCurrentUser().getUsername();
-            thread.send(message);
-            RoomService.sendToRoom(roomId, message);
+            thread.getCurrentUser().send("ROOM exit success " + thread.getCurrentUser().getUsername());
+            RoomService.sendToRoom(roomId, "ROOM exit success " + thread.getCurrentUser().getUsername());
         }
         else {
             thread.send("ROOM exit fail");

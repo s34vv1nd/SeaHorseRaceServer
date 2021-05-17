@@ -1,18 +1,13 @@
 package SeaHorseServer.controller;
 
 import SeaHorseServer.EchoThreadWriter;
-import SeaHorseServer.model.Horse;
 import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
-import SeaHorseServer.repository.HorseRepo;
 import SeaHorseServer.repository.RoomRepo;
-import SeaHorseServer.repository.UserRepo;
 import SeaHorseServer.service.GameService;
 import SeaHorseServer.service.RoomService;
-import SeaHorseServer.utils.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameController {
 

@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import SeaHorseServer.model.User;
+import SeaHorseServer.service.RoomService;
 import SeaHorseServer.service.UserService;
 
 public class EchoThreadReader extends Thread {
@@ -43,15 +44,15 @@ public class EchoThreadReader extends Thread {
         } catch (IOException e1) {
           e1.printStackTrace();
         }
-        if (echoThreadWriter.getCurrentUser() == null) {
+        User user = echoThreadWriter.getCurrentUser();
+        if (user == null) {
           System.err.println("An user has disconnected.");
         }
         else {
-          System.err.println("User " + echoThreadWriter.getCurrentUser().getUsername() + " has disconnected.");
+          System.err.println("User " + user.getUsername() + " has disconnected.");
           try {
             UserService.logout(echoThreadWriter);
           } catch (IOException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
           }
         }

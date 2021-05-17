@@ -1,6 +1,5 @@
 package SeaHorseServer.controller;
 
-import SeaHorseServer.EchoThreadReader;
 import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.UserRepo;

@@ -1,8 +1,6 @@
 package SeaHorseServer.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import SeaHorseServer.model.Horse;
@@ -54,7 +52,7 @@ public class GameService {
     Room room = RoomRepo.getInstance().getRoomById(roomId);
     User user = UserRepo.getInstance().getUserByColor(roomId, color);
     // System.out.println(room.getCurrentDice() + " " + user.getColor() + " " + canLaunch(user));
-    if (room.getCurrentDice() == 6 && canLaunch(user)) return true;
+    if (canLaunch(user, room.getCurrentDice())) return true;
     for (Horse horse : HorseRepo.getInstance().getHorsesByColor(roomId, color)) {
       if (canMove(roomId, horse, room.getCurrentDice()) != -1 || canUprank(horse, room.getCurrentDice())) {
         return true;
@@ -78,7 +76,7 @@ public class GameService {
   }
 
   public synchronized static boolean launch(User user) throws IOException {
-    if (canLaunch(user)) {
+    if (canLaunch(user, RoomRepo.getInstance().getRoomById(user.getRoomId()).getCurrentDice())) {
       HorseRepo.getInstance().addNewHorse(new Horse(user.getRoomId(), user.getColor()));
       RoomRepo.getInstance().updateRoomTurn(user.getRoomId(), getNextTurn(user.getRoomId()));
       return true;
@@ -86,7 +84,8 @@ public class GameService {
     return false;
   }
 
-  private static boolean canLaunch(User user) {
+  private static boolean canLaunch(User user, int dice) {
+    if (dice != 6) return false;
     Horse horse = HorseRepo.getInstance().getHorseByPosition(user.getRoomId(), Utils.STARTING_POSITIONS[user.getColor()]);
     // System.out.println((horse == null) + " " + HorseRepo.getInstance().getHorsesByColor(user.getRoomId(), user.getColor()).size());
     if (horse == null && HorseRepo.getInstance().getHorsesByColor(user.getRoomId(), user.getColor()).size() < 4) {

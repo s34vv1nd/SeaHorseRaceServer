@@ -1,13 +1,10 @@
 package SeaHorseServer.repository;
 
-import SeaHorseServer.EchoThreadWriter;
 import SeaHorseServer.model.User;
 import SeaHorseServer.utils.Utils;
-import com.opencsv.CSVWriter;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;

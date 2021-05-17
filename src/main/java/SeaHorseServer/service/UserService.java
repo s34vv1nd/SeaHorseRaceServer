@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import SeaHorseServer.EchoThreadWriter;
-import SeaHorseServer.ThreadedEchoServer;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.repository.UserRepo;
@@ -68,8 +67,8 @@ public class UserService {
       String username = thread.getCurrentUser().getUsername();
       exitRoom(username);
       User user = UserRepo.getInstance().getUserByUserName(username);
-      thread.setUser(null);
       user.setWriter(null);
+      thread.setUser(null);
       return true;
     }
     return false;

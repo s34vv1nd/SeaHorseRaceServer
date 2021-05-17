@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import SeaHorseServer.model.Room;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.HorseRepo;
 import SeaHorseServer.repository.RoomRepo;

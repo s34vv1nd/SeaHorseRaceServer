@@ -1,7 +1,6 @@
 package SeaHorseServer.repository;
 
 import SeaHorseServer.model.Horse;
-import SeaHorseServer.model.User;
 import SeaHorseServer.utils.Utils;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
