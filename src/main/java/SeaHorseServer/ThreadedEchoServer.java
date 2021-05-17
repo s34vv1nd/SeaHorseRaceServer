@@ -5,6 +5,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
+import SeaHorseServer.model.User;
+
 public class ThreadedEchoServer {
 
     static final int PORT = 5000;

@@ -18,14 +18,6 @@ public class UserController {
     public UserController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
         this.words = words;
-        if (thread.getCurrentUser() == null) {
-            System.err.println("Not login");
-            return;
-        }
-        if (thread.getCurrentUser().getRoomId() == -1) {
-            System.err.println("Not in room");
-            return;
-        }
         switch (words[1]) {
             case "fetch":
                 this.fetch();

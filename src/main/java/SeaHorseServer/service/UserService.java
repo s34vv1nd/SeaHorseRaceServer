@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import SeaHorseServer.EchoThreadWriter;
+import SeaHorseServer.ThreadedEchoServer;
 import SeaHorseServer.model.User;
 import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.repository.UserRepo;
@@ -29,6 +30,8 @@ public class UserService {
   }
 
   public synchronized static boolean enterRoom(String username, int roomId, String password) throws IOException {
+    if (RoomRepo.getInstance().getRoomById(roomId) == null) return false;
+    if (RoomRepo.getInstance().getRoomById(roomId).getCurrentTurn() != -1) return false;
     if (!RoomRepo.getInstance().getRoomById(roomId).getPassword().equals(password)) 
       return false;
     ArrayList<Integer> colors = RoomService.emptySlotsInRoom(roomId);

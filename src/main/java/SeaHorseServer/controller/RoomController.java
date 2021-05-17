@@ -21,10 +21,6 @@ public class RoomController {
     public RoomController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
         this.words = words;
-        if (thread.getCurrentUser() == null) {
-            System.err.println("Not login");
-            return;
-        }
         switch (words[1]) {
             case "create":
                 this.create();
@@ -72,12 +68,6 @@ public class RoomController {
         int roomId = RoomService.createRoom(password);
         if (checkBasicConditions() && roomId != -1) {
             thread.send("ROOM create success " + roomId + " " + password);
-            for (EchoThreadWriter _thread : ThreadedEchoServer.clientWriterThreads) {
-                User user = _thread.getCurrentUser();
-                if (user != null && user.getRoomId() == -1) {
-                    _thread.send("ROOM fetch_one success " + roomId + " " + 1 + " " + -1);
-                }
-            }
         }
         else {
             thread.send("ROOM create fail");

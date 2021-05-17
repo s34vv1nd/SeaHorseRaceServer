@@ -33,6 +33,7 @@ USER ready
     4: USER ready success "username" 
     1: USER ready fail
     4: USER start (if all players in room are ready)
+    4: GAME turn "color" roll/move
 
 USER fetch "username"
     1: USER fetch success "username" "room_id" "color" "status"
@@ -41,19 +42,23 @@ USER fetch "username"
 GAME roll
     4: GAME roll success "color" “roll_value”
     1: GAME roll fail
+    4: GAME turn "color" roll/move
 
 GAME move "start_position"
     4: GAME move success "start_position" "end_position"
     1: GAME move fail
+    4: GAME turn "color" roll/move
 
 GAME launch
     4: GAME launch success "color"
     1: GAME launch fail
+    4: GAME turn "color" roll/move
 
 GAME uprank "current rank"
     4: GAME uprank success "color" "current rank" "new rank"
     1: GAME uprank fail
     4: GAME end "color" (if someone win)
+    4: GAME turn "color" roll/move
 
 GAME exit
     4: GAME exit "username"

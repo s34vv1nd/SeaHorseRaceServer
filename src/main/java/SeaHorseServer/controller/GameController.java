@@ -22,18 +22,7 @@ public class GameController {
     public GameController(EchoThreadWriter thread, String[] words) throws IOException {
         this.thread = thread;
         this.words = words;
-        if (thread.getCurrentUser() == null) {
-            System.err.println("Not login");
-            return;
-        }
-        if (thread.getCurrentUser().getRoomId() == -1) {
-            System.err.println("Not in room");
-            return;
-        }
-        Room room = RoomRepo.getInstance().getRoomById(thread.getCurrentUser().getRoomId());
-        if (room == null || room.getCurrentTurn() == -1) {
-            System.err.println("Not in game");
-        }
+        
         switch (words[1]) {
             case "roll":
                 this.roll();
@@ -50,18 +39,42 @@ public class GameController {
             case "exit":
                 this.exit();
                 break;
+            case "end": //for hack
+                this.end();
+                break;
             default:
                 System.err.println("Cannot dispatch " + words[1]);
         }
     }
 
+    private boolean checkBasicConditions() {
+        if (thread.getCurrentUser() == null) {
+            System.err.println("Not login");
+            return false;
+        }
+        if (thread.getCurrentUser().getRoomId() == -1) {
+            System.err.println("Not in room");
+            return false;
+        }
+        Room room = RoomRepo.getInstance().getRoomById(thread.getCurrentUser().getRoomId());
+        if (room == null || room.getCurrentTurn() == -1) {
+            System.err.println("Not in game");
+            return false;
+        }
+        return true;
+    }
+
     private void roll() throws IOException {
-        User user = thread.getCurrentUser();
-        if (user == null) {
+        if (checkBasicConditions()) {
             thread.send("GAME roll fail");
         }
         else {
-            int dice = GameService.roll(user);
+            User user = thread.getCurrentUser();
+            int hackValue = -1;
+            if (words.length > 2) {
+                hackValue = Integer.parseInt(words[2]);
+            }
+            int dice = GameService.roll(user, hackValue);
             if (dice == -1) {
                 thread.send("GAME roll fail");
             } else {
@@ -71,7 +84,7 @@ public class GameController {
     }
 
     private void launch() throws IOException {
-        if (GameService.launch(thread.getCurrentUser())) {
+        if (checkBasicConditions() && GameService.launch(thread.getCurrentUser())) {
             RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME launch success " + thread.getCurrentUser().getColor());
         } else {
             thread.getCurrentUser().send("GAME launch fail");
@@ -79,35 +92,50 @@ public class GameController {
     }
 
     private void move() throws IOException {
-        int startPos = Integer.parseInt(words[2]);
-        int result = GameService.move(thread.getCurrentUser(), startPos);
-        if (result != -1) {
-            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME move success " + thread.getCurrentUser().getColor() + " " + startPos + " " + result);
+        if (checkBasicConditions()) {
+            int startPos = Integer.parseInt(words[2]);
+            int result = GameService.move(thread.getCurrentUser(), startPos);
+            if (result != -1) {
+                RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME move success " + thread.getCurrentUser().getColor() + " " + startPos + " " + result);
+            } else {
+                thread.getCurrentUser().send("GAME move fail");
+            }
         } else {
             thread.getCurrentUser().send("GAME move fail");
         }
     }
 
     private void uprank() throws IOException {
-        int curRank = Integer.parseInt(words[2]);
-        int newRank = GameService.uprank(thread.getCurrentUser(), curRank);
-        if (newRank == -1) {
-            thread.send("GAME uprank fail");
-        } else {
-            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), 
-                "GAME uprank success " + thread.getCurrentUser().getColor() + " " + curRank + " " + newRank);
-            if (GameService.canEnd(thread.getCurrentUser())) {
-                GameService.endGame(thread.getCurrentUser());
-                RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME end " + thread.getCurrentUser().getColor());
+        if (checkBasicConditions()) {
+            int curRank = Integer.parseInt(words[2]);
+            int newRank = GameService.uprank(thread.getCurrentUser(), curRank);
+            if (newRank == -1) {
+                thread.send("GAME uprank fail");
+            } else {
+                RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), 
+                    "GAME uprank success " + thread.getCurrentUser().getColor() + " " + curRank + " " + newRank);
+                if (GameService.canEnd(thread.getCurrentUser())) {
+                    GameService.endGame(thread.getCurrentUser());
+                    RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME end " + thread.getCurrentUser().getColor());
+                }
             }
+        } else {
+            thread.send("GAME uprank fail");
         }
     }
 
     private void exit() throws IOException {
-        if (GameService.exit(thread.getCurrentUser())) {
+        if (checkBasicConditions() && GameService.exit(thread.getCurrentUser())) {
             RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME exit success " + thread.getCurrentUser().getUsername());
         } else {
             thread.send("GAME exit fail");
+        }
+    }
+
+    private void end() throws IOException {
+        if (checkBasicConditions()) {
+            GameService.endGame(thread.getCurrentUser());
+            RoomService.sendToRoom(thread.getCurrentUser().getRoomId(), "GAME end " + thread.getCurrentUser().getColor());
         }
     }
 
