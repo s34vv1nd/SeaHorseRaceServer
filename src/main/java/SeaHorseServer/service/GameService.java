@@ -19,7 +19,7 @@ public class GameService {
     RoomRepo.getInstance().updateRoomTurn(roomId, getNextTurn(roomId));
   }
 
-  private synchronized static int getNextTurn(int roomId) throws IOException {
+  public synchronized static int getNextTurn(int roomId) throws IOException {
     int result = -1;
     if (winner(roomId) != null) {
       RoomService.sendToRoom(roomId, "GAME turn -1 roll");

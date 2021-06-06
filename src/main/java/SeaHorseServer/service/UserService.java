@@ -52,11 +52,16 @@ public class UserService {
 
   public synchronized static boolean exitRoom(String username) throws IOException {
     int roomId = UserRepo.getInstance().getUserByUserName(username).getRoomId();
+    int color = UserRepo.getInstance().getUserByUserName(username).getColor();
     if (roomId != -1) {
       UserRepo.getInstance().setAllStatus(roomId, 0);
       UserRepo.getInstance().setRoomId(username, -1);
       UserRepo.getInstance().setColor(username, -1);
-      RoomService.removeRoom(roomId);
+      if (!RoomService.removeRoom(roomId)) {
+        if (color == RoomRepo.getInstance().getRoomById(roomId).getCurrentPlayer()) {
+          RoomRepo.getInstance().getRoomById(roomId).setCurrentTurn(GameService.getNextTurn(roomId));
+        }
+      }
       return true;
     }
     return false;

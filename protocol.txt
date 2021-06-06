@@ -29,8 +29,8 @@ ROOM exit
     4: ROOM exit “username”
     (Change all other players in that room to not-ready)
 
-USER ready
-    4: USER ready success "username" 
+USER ready "state"
+    4: USER ready success "username" "state"
     1: USER ready fail
     4: USER start (if all players in room are ready)
     4: GAME turn "color" roll/move
