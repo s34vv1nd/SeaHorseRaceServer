@@ -22,8 +22,12 @@ ROOM create "password"
     1: ROOM create fail
 
 ROOM join "room_id" "password"
-    4: ROOM join success "room_id" “username1” “username2” ...
+    4: ROOM join success "room_id"
     1: ROOM join fail "room_id"
+
+ROOM fetch_users  // fetch users in room of requesting user
+    1: ROOM fetch_users success "room_id" "username1" "username2" ...
+    1: ROOM fetch_users fail "room_id"
 
 ROOM exit
     4: ROOM exit “username”

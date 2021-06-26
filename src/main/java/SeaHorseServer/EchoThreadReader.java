@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import SeaHorseServer.model.User;
+import SeaHorseServer.repository.RoomRepo;
 import SeaHorseServer.service.RoomService;
 import SeaHorseServer.service.UserService;
 
@@ -50,8 +51,12 @@ public class EchoThreadReader extends Thread {
         }
         else {
           System.err.println("User " + user.getUsername() + " has disconnected.");
+          int roomId = user.getRoomId();
           try {
             UserService.logout(echoThreadWriter);
+            if (roomId != -1) {
+              RoomService.sendToRoom(roomId, "ROOM exit success " + user.getUsername());
+            }
           } catch (IOException e1) {
             e1.printStackTrace();
           }
